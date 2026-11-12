@@ -1,0 +1,16 @@
+# Laborkonfiguration Referat Thema 4 – nur lokales Labor, niemals Produktion.
+#
+# Release 1.3 (Tag v1.3.0) reicht QA_SUMMARY_* nicht an den App-Container durch;
+# dort gilt der Releasedefault QA_SUMMARY_ENABLED=false. Docker Compose lädt diese
+# Datei automatisch zusätzlich zu docker-compose.yml.
+#
+# Einzige bewusste Abweichung von der Baseline: QA_SUMMARY_ENABLED=true.
+# QA_SUMMARY_TIMEOUT_MS wird nur durchgereicht; ohne Angabe gilt der Releasedefault
+# 8000 ms. Für die 4C-Variante gezielt setzen, z. B.:
+#   QA_SUMMARY_TIMEOUT_MS=30000 npm run docker:up:llm
+# Rückweg zur Baseline: denselben Befehl ohne die Variable ausführen.
+services:
+  app:
+    environment:
+      QA_SUMMARY_ENABLED: ${QA_SUMMARY_ENABLED:-true}
+      QA_SUMMARY_TIMEOUT_MS: ${QA_SUMMARY_TIMEOUT_MS:-8000}
