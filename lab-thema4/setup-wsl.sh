@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 # Labor-Setup Referat Thema 4 – arsnova.eu Release 1.3 (Tag v1.3.0, Commit 87c39334).
 #
-# Ausführen in WSL (Ubuntu), sobald Docker Desktop mit WSL-Integration läuft:
-#   bash /mnt/f/arsnova.eu/lab-thema4/setup-wsl.sh
+# Empfohlen: über lab-thema4/bootstrap-wsl.sh starten. Das klont das Repo ins
+# WSL-Dateisystem (~/arsnova.eu) und ruft danach dieses Skript dort auf.
+# Direkt geht auch (im WSL-Klon oder auf /mnt/f), sobald Docker Desktop mit
+# WSL-Integration läuft:
+#   bash lab-thema4/setup-wsl.sh
 #
 # Braucht in WSL nur Docker und Node – kein npm install. Die Lastskripte nutzen nur
-# Node-Bordmittel. node_modules gehört der Windows-Seite (WebStorm, Plan-B-Tests);
-# in WSL bitte NIE npm install/ci ausführen, sonst landen Linux-Binaries dort.
+# Node-Bordmittel. Auf /mnt/f gehört node_modules der Windows-Seite (WebStorm,
+# Plan-B-Tests); dort in WSL NIE npm install/ci ausführen.
+#
+# Fehlt das Modell, wird es aus MODEL_SOURCE_DIR kopiert (Standard: der bereits
+# geprüfte Download auf F:) und nur notfalls neu geladen.
 #
 # Idempotent: erledigte Schritte werden übersprungen. Ändert keinen Releasecode.
 # Einzige Laborabweichung: docker-compose.override.yml (QA_SUMMARY_ENABLED=true).
@@ -15,6 +21,7 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXPECTED_COMMIT="87c39334619fbcb0c5782b061da1ba0df0ba3142"
+MODEL_SOURCE_DIR="${MODEL_SOURCE_DIR:-/mnt/f/arsnova.eu/models/open-weight-llm}"
 NVM_VERSION="v0.40.3"
 HEALTH_URL="http://127.0.0.1:3000/trpc/health.check"
 MANIFEST_OUT="$REPO_DIR/lab-thema4/referenzmanifest.md"
@@ -37,9 +44,15 @@ step "2/7 Release-Stand prüfen"
 # Git in WSL lehnt Repos auf /mnt/* sonst wegen abweichender Eigentümer ab.
 git config --global --get-all safe.directory | grep -qxF "$REPO_DIR" \
   || git config --global --add safe.directory "$REPO_DIR"
-head_commit="$(git rev-parse HEAD)"
-[ "$head_commit" = "$EXPECTED_COMMIT" ] \
-  || fail "HEAD ist $head_commit, erwartet v1.3.0 ($EXPECTED_COMMIT). Branch referat/thema-4 auschecken."
+git cat-file -e "${EXPECTED_COMMIT}^{commit}" 2>/dev/null \
+  || fail "Commit v1.3.0 ($EXPECTED_COMMIT) fehlt im Repo."
+git merge-base --is-ancestor "$EXPECTED_COMMIT" HEAD \
+  || fail "HEAD basiert nicht auf v1.3.0. Branch referat/thema-4 auschecken, nicht main."
+# Erlaubt sind über v1.3.0 hinaus nur die Labordateien – Releasecode bleibt unverändert.
+release_drift="$(git diff --name-only "$EXPECTED_COMMIT" HEAD -- . \
+  ':(exclude)docker-compose.override.yml' ':(exclude)lab-thema4')"
+[ -z "$release_drift" ] \
+  || fail "Gegenüber v1.3.0 geänderte Releasedateien: $(echo "$release_drift" | tr '\n' ' ')"
 if git ls-files --eol | grep -q 'w/crlf'; then
   fail "Arbeitskopie enthält CRLF-Dateien (Windows-Checkout). entrypoint.sh würde im Container scheitern."
 fi
@@ -47,7 +60,7 @@ if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   printf '    Hinweis: getrackte Dateien sind geändert – Baseline ist dann nicht mehr unverändert:\n'
   git status --short --untracked-files=no | sed 's/^/      /'
 fi
-ok "v1.3.0, LF-Zeilenenden"
+ok "v1.3.0 plus nur Labordateien ($(git rev-parse --abbrev-ref HEAD) @ $(git rev-parse --short HEAD)), LF-Zeilenenden"
 
 step "3/7 Node $(cat .nvmrc) über nvm"
 export NVM_DIR="$HOME/.nvm"
@@ -67,9 +80,15 @@ step "4/7 Modell prüfen (SHA-256 laut docker/open-weight-llm/model-manifest.jso
 model_file="$(node -e "process.stdout.write(require('./docker/open-weight-llm/model-manifest.json').filename)")"
 model_url="$(node -e "process.stdout.write(require('./docker/open-weight-llm/model-manifest.json').downloadUrl)")"
 if [ ! -s "models/open-weight-llm/$model_file" ]; then
-  printf '    Modell fehlt, lade %s (2,5 GB) …\n' "$model_file"
   mkdir -p models/open-weight-llm
-  curl --fail --location --retry 5 -C - --output "models/open-weight-llm/$model_file" "$model_url"
+  if [ -s "$MODEL_SOURCE_DIR/$model_file" ]; then
+    printf '    Kopiere geprüftes Modell aus %s …\n' "$MODEL_SOURCE_DIR"
+    cp "$MODEL_SOURCE_DIR/$model_file" "models/open-weight-llm/$model_file.part"
+    mv "models/open-weight-llm/$model_file.part" "models/open-weight-llm/$model_file"
+  else
+    printf '    Modell fehlt, lade %s (2,5 GB) …\n' "$model_file"
+    curl --fail --location --retry 5 -C - --output "models/open-weight-llm/$model_file" "$model_url"
+  fi
 fi
 node scripts/open-weight-llm/verify-model.mjs
 ok "Modell verifiziert"
@@ -103,7 +122,8 @@ step "7/7 Referenzmanifest schreiben → lab-thema4/referenzmanifest.md"
   echo "Erzeugt: $(date -Iseconds) durch lab-thema4/setup-wsl.sh"
   echo
   echo "## Release"
-  echo "- Tag/Commit: $(git describe --tags --exact-match 2>/dev/null || echo '-') / $(git rev-parse HEAD)"
+  echo "- Basis: v1.3.0 / $EXPECTED_COMMIT"
+  echo "- Laborstand: $(git rev-parse --abbrev-ref HEAD) @ $(git rev-parse HEAD) (über v1.3.0 hinaus nur docker-compose.override.yml und lab-thema4/)"
   echo "- Laborabweichung: docker-compose.override.yml (QA_SUMMARY_ENABLED=true)"
   echo
   echo "## Hardware (WSL-Sicht)"
