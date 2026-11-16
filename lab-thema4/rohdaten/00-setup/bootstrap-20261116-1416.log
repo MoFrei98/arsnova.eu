@@ -1,0 +1,310 @@
+==> Repo bereit: /home/mofrei/arsnova.eu · referat/thema-4 @ 2558c863 · Basis v1.3.0
+
+==> 1/8 Umgebung prüfen
+    ok: Docker 29.9.3 · 5.7.0
+
+==> 2/8 Release-Stand prüfen
+    ok: v1.3.0 plus nur Labordateien (referat/thema-4 @ 2558c863), LF-Zeilenenden
+
+==> 3/8 Node 24.18.0 über nvm
+v24.18.0 is already installed.
+    ok: Node v24.18.0
+
+==> 4/8 Abhängigkeiten der Lastskripte (@trpc/client, ws)
+    ok: node_modules vorhanden
+
+==> 5/8 Modell prüfen (SHA-256 laut docker/open-weight-llm/model-manifest.json)
+Qwen3-4B-Instruct-2507-Q4_K_M.gguf: verified 2497281120 bytes, sha256:3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597
+    ok: Modell verifiziert
+
+==> 6/8 Netzwerkfreie Vorprüfung des Referenzfalls
+✔ verwendet das kanonische deutsche Demo-Quiz mit 13 Fragen und zehn Fragetypen (5.942291ms)
+✔ erstellt für mindestens 250 Teilnehmende jeweils genau zehn sinnvolle Fragen (0.556391ms)
+✔ jede Person erhält fünf verschiedene Demo- und fünf verschiedene App-Fragen (0.302442ms)
+✔ der kuratierte Korpus deckt konkrete Demo- und arsnova.eu-Themen ab (0.089099ms)
+✔ verweigert kleinere oder produktseitig unmögliche Lastprofile (0.282189ms)
+✔ akzeptiert nur explizite lokale HTTP-tRPC-Ziele (0.214296ms)
+✔ erzwingt genau eine explizite Betriebsart (0.166728ms)
+✔ legt vor dem Lastlauf ein bestätigtes manuelles quiz-weites Lernziel an (0.631687ms)
+✔ --validate bleibt auch mit externer TRPC_URL vollständig netzwerkfrei (59.696877ms)
+✔ verweigert den Lastlauf vor dem ersten Join, wenn Summary V2 im Backend aus ist (0.286934ms)
+✔ beendet die Demo-Session idempotent, wenn ein Erweiterungsschritt fehlschlägt (0.273506ms)
+✔ --run verweigert ein externes Ziel vor einem Backendzugriff (51.03852ms)
+✔ die Report-Projektion entfernt Texte, Tokens und Personenkennungen (0.476783ms)
+✔ der persistierte Report verwendet keinen absoluten Benutzerpfad (0.145496ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 428.318355
+{
+  "mode": "network-free-validation",
+  "canonicalQuiz": {
+    "path": "/home/mofrei/arsnova.eu/apps/frontend/src/assets/demo/quiz-demo-showcase.de.json",
+    "name": "Praxis-Showcase: Team-Quiz",
+    "questions": 13,
+    "questionTypes": [
+      "CATEGORIZATION",
+      "FREETEXT",
+      "MATCHING",
+      "MULTIPLE_CHOICE",
+      "NUMERIC_ESTIMATE",
+      "ORDERING",
+      "RATING",
+      "SHORT_TEXT",
+      "SINGLE_CHOICE",
+      "SURVEY"
+    ]
+  },
+  "corpus": {
+    "participants": 250,
+    "questionsPerParticipant": 10,
+    "questions": 2500,
+    "uniqueTexts": 50,
+    "scopes": {
+      "demo-quiz": 1250,
+      "arsnova.eu": 1250
+    }
+  },
+  "networkModel": "single-local-runner-shared-source-address"
+}
+    ok: Issue-#456-Szenario valide
+
+==> 7/8 Stack bauen und starten (App + Postgres + Redis + Runtime, Profil llm)
+    Laborsecret JWT_SECRET in .env erzeugt
+    Laborsecret CAPABILITY_ENVELOPE_KEY_BASE64 in .env erzeugt
+    Erster Build dauert mehrere Minuten (App-Image, llama.cpp-Image).
+
+> arsnova-eu@0.1.0 docker:up:llm
+> OPEN_WEIGHT_LLM_ENABLED=true docker compose --profile llm up -d --build open-weight-llm app
+
+ Image arsnovaeu-app Building 
+ Image arsnova-open-weight-llm:llama-b10524 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 998B done
+#1 DONE 0.0s
+
+#2 [open-weight-llm internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.25kB done
+#2 DONE 0.0s
+
+#3 [app internal] load build definition from Dockerfile
+#3 transferring dockerfile: 5.62kB done
+#3 DONE 0.0s
+
+#4 [app internal] load metadata for docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#4 ...
+
+#5 [auth] library/node:pull token for registry-1.docker.io
+#5 DONE 0.0s
+
+#6 [open-weight-llm internal] load metadata for ghcr.io/ggml-org/llama.cpp:server-b10524@sha256:57e505f69c3a55fa5dd9c15fced47cff7a899f5b5b504ea93d75b2f401b87830
+#6 DONE 0.5s
+
+#7 [open-weight-llm internal] load .dockerignore
+#7 transferring context: 2B done
+#7 DONE 0.0s
+
+#8 [open-weight-llm 1/4] FROM ghcr.io/ggml-org/llama.cpp:server-b10524@sha256:57e505f69c3a55fa5dd9c15fced47cff7a899f5b5b504ea93d75b2f401b87830
+#8 resolve ghcr.io/ggml-org/llama.cpp:server-b10524@sha256:57e505f69c3a55fa5dd9c15fced47cff7a899f5b5b504ea93d75b2f401b87830 0.0s done
+#8 DONE 0.0s
+
+#9 [open-weight-llm internal] load build context
+#9 transferring context: 173B done
+#9 DONE 0.0s
+
+#10 [open-weight-llm 2/4] RUN groupadd --gid 65532 arsnova-llm     && useradd --uid 65532 --gid 65532 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin arsnova-llm     && mkdir -p /opt/arsnova /run/open-weight-llm     && chown 65532:65532 /run/open-weight-llm
+#10 CACHED
+
+#11 [open-weight-llm 3/4] COPY entrypoint.sh healthcheck.sh validate-bind.sh validate-token.sh model.sha256 /opt/arsnova/
+#11 CACHED
+
+#12 [open-weight-llm 4/4] RUN chmod 0555 /opt/arsnova/entrypoint.sh /opt/arsnova/healthcheck.sh /opt/arsnova/validate-bind.sh /opt/arsnova/validate-token.sh     && chmod 0444 /opt/arsnova/model.sha256
+#12 CACHED
+
+#13 [open-weight-llm] exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:6d3e1eafbc78933f719fbcd5ba3e73b4d4fd978c42cfea6b7976973212322fad done
+#13 exporting config sha256:88a787b5b23ec456a6990e6e1d8595a37c9719e1e7cf37366de34d5a727fbd5a done
+#13 exporting attestation manifest sha256:00584f0f3ee5c90887ac5fdb33e2476e60921acda228c1e3bceb67fe60dc320d 0.0s done
+#13 exporting manifest list sha256:1eaf4fa4e675100361d11526cbe91913328167ae722a5617c428e377682bbb0d 0.0s done
+#13 naming to docker.io/library/arsnova-open-weight-llm:llama-b10524 done
+#13 unpacking to docker.io/library/arsnova-open-weight-llm:llama-b10524 done
+#13 DONE 0.1s
+
+#4 [app internal] load metadata for docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#4 DONE 0.8s
+
+#14 [open-weight-llm] resolving provenance for metadata file
+#14 DONE 0.0s
+
+#15 [app internal] load .dockerignore
+#15 transferring context: 123B done
+#15 DONE 0.0s
+
+#16 [app builder  1/17] FROM docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#16 resolve docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 0.0s done
+#16 DONE 0.0s
+
+#17 [app internal] load build context
+#17 transferring context: 192.75kB 0.3s done
+#17 DONE 0.3s
+
+#18 [app production 16/22] COPY --from=builder /app/libs/session-export-report/package.json libs/session-export-report/package.json
+#18 CACHED
+
+#19 [app production 20/22] COPY scripts/pdf-worker-healthcheck.mjs /app/scripts/
+#19 CACHED
+
+#20 [app builder  4/17] COPY libs/shared-types/package.json libs/shared-types/
+#20 CACHED
+
+#21 [app builder 11/17] COPY apps/backend/ apps/backend/
+#21 CACHED
+
+#22 [app builder  7/17] COPY apps/frontend/package.json apps/frontend/
+#22 CACHED
+
+#23 [app builder  9/17] COPY tsconfig.json ./
+#23 CACHED
+
+#24 [app builder 15/17] COPY scripts/fix-esm-imports.mjs scripts/ensure-schema.mjs scripts/ensure-schema.d.mts scripts/
+#24 CACHED
+
+#25 [app production 17/22] COPY --from=builder /app/apps/frontend/dist/browser apps/frontend/dist
+#25 CACHED
+
+#26 [app production  4/22] COPY package.json package-lock.json .npmrc ./
+#26 CACHED
+
+#27 [app builder  2/17] WORKDIR /app
+#27 CACHED
+
+#28 [app production  7/22] COPY apps/backend/package.json apps/backend/
+#28 CACHED
+
+#29 [app production 13/22] COPY --from=builder /app/libs/shared-types/dist libs/shared-types/dist
+#29 CACHED
+
+#30 [app builder 14/17] RUN npx prisma generate
+#30 CACHED
+
+#31 [app production  5/22] COPY libs/shared-types/package.json libs/shared-types/
+#31 CACHED
+
+#32 [app production  3/22] RUN apk upgrade --no-cache     && apk add --no-cache       chromium       nss       freetype       harfbuzz       ca-certificates       ttf-freefont       font-noto       'libssh>=0.12.1-r0'       'libcrypto3>=3.5.8-r0'       'libssl3>=3.5.8-r0'       'libexpat>=2.8.4-r0'       'libblkid>=2.42.3-r0'       'libmount>=2.42.3-r0'       'libuuid>=2.42.3-r0'
+#32 CACHED
+
+#33 [app production 18/22] COPY scripts/docker-entrypoint.sh /app/scripts/
+#33 CACHED
+
+#34 [app production 10/22] COPY prisma.config.ts tsconfig.json ./
+#34 CACHED
+
+#35 [app production 15/22] COPY --from=builder /app/libs/session-export-report/dist libs/session-export-report/dist
+#35 CACHED
+
+#36 [app production  6/22] COPY libs/session-export-report/package.json libs/session-export-report/
+#36 CACHED
+
+#37 [app builder  5/17] COPY libs/session-export-report/package.json libs/session-export-report/
+#37 CACHED
+
+#38 [app production 19/22] COPY scripts/container-runtime-smoke.mjs /app/scripts/
+#38 CACHED
+
+#39 [app builder 16/17] RUN npx tsc -b apps/backend/tsconfig.json     && node scripts/fix-esm-imports.mjs
+#39 CACHED
+
+#40 [app production 11/22] COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
+#40 CACHED
+
+#41 [app production 12/22] COPY --from=builder /app/apps/backend/dist apps/backend/dist
+#41 CACHED
+
+#42 [app builder 13/17] COPY prisma/ prisma/
+#42 CACHED
+
+#43 [app production 21/22] COPY scripts/pdf-worker-runtime-smoke.mjs /app/scripts/
+#43 CACHED
+
+#44 [app builder  8/17] RUN npm ci
+#44 CACHED
+
+#45 [app builder 12/17] COPY apps/frontend/ apps/frontend/
+#45 CACHED
+
+#46 [app production  9/22] COPY prisma/ prisma/
+#46 CACHED
+
+#47 [app builder 17/17] RUN npm run build:localize -w @arsnova/frontend
+#47 CACHED
+
+#48 [app production  8/22] RUN npm ci --omit=dev     && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+#48 CACHED
+
+#49 [app production 14/22] COPY --from=builder /app/libs/shared-types/package.json libs/shared-types/package.json
+#49 CACHED
+
+#50 [app builder 10/17] COPY libs/ libs/
+#50 CACHED
+
+#51 [app builder  6/17] COPY apps/backend/package.json apps/backend/
+#51 CACHED
+
+#52 [app builder  3/17] COPY package.json package-lock.json .npmrc ./
+#52 CACHED
+
+#53 [app production 22/22] RUN chmod +x /app/scripts/docker-entrypoint.sh     && mkdir -p /run/pdf-worker /run/spacy     && chown node:node /run/pdf-worker /run/spacy
+#53 CACHED
+
+#54 [app] exporting to image
+#54 exporting layers done
+#54 exporting manifest sha256:58a62a97cd24428925b463ba4ad2ae8eb32c1e4bf6979ea9a5692db83ca29dd7 done
+#54 exporting config sha256:d065e5dd5b85b9c9f31523af164e94b39b7cc4424d9f1d8e7b1c0c25df845a5d done
+#54 exporting attestation manifest sha256:24992b46dcf6165de92d2184c57de37fb863fff5b6cebe00446bea5230a97142 0.0s done
+#54 exporting manifest list sha256:f6b2beb8954096568c9dfa741dfe2c290055d78bf8a9a8298a8b946cdd7e124a 0.0s done
+#54 naming to docker.io/library/arsnovaeu-app:latest done
+#54 unpacking to docker.io/library/arsnovaeu-app:latest done
+#54 DONE 0.1s
+
+#55 [app] resolving provenance for metadata file
+#55 DONE 0.0s
+ Image arsnova-open-weight-llm:llama-b10524 Built 
+ Image arsnovaeu-app Built 
+ Container arsnova-v3-open-weight-llm Running 
+ Container arsnova-v3-postgres Running 
+ Container arsnova-v3-redis Running 
+ Container arsnova-v3-app Recreate 
+ Container arsnova-v3-app Recreated 
+ Container arsnova-v3-open-weight-llm Waiting 
+ Container arsnova-v3-postgres Waiting 
+ Container arsnova-v3-redis Waiting 
+ Container arsnova-v3-redis Healthy 
+ Container arsnova-v3-postgres Healthy 
+ Container arsnova-v3-open-weight-llm Healthy 
+ Container arsnova-v3-app Starting 
+ Container arsnova-v3-app Started 
+    Warte auf App-Health.
+NAME                         IMAGE                                                                     COMMAND                  SERVICE           CREATED         STATUS                   PORTS
+arsnova-v3-app               arsnovaeu-app                                                             "/app/scripts/docker…"   app               5 seconds ago   Up 5 seconds (healthy)   0.0.0.0:3000-3002->3000-3002/tcp, [::]:3000-3002->3000-3002/tcp
+arsnova-v3-open-weight-llm   sha256:7dd403b7fe0f01f0aa7d0f60ab9abbd2a3155186569b034fa73b08a950ba8322   "/opt/arsnova/entryp…"   open-weight-llm   6 minutes ago   Up 6 minutes (healthy)   
+arsnova-v3-postgres          postgres:16-alpine                                                        "docker-entrypoint.s…"   postgres          6 minutes ago   Up 6 minutes (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+arsnova-v3-redis             redis:7.4-alpine                                                          "docker-entrypoint.s…"   redis             6 minutes ago   Up 6 minutes (healthy)   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+    ok: App healthy, QA_SUMMARY_ENABLED=true, OPEN_WEIGHT_LLM_ENABLED=true
+
+==> 8/8 Referenzmanifest schreiben → lab-thema4/referenzmanifest.md
+    ok: /home/mofrei/arsnova.eu/lab-thema4/referenzmanifest.md
+
+Labor läuft. Nächste Schritte (Phase Baseline):
+  npm run load:issue-456:run                      # Referenzfall, 3× wiederholen, Report sichern
+  docker compose logs app | grep qa_summary       # Telemetrie zum Lauf
+  npm run load:smoke:qa-classroom-30              # Live-Last parallel (Join/Vote/Submit)
+
+Störungen (4A):  docker pause|unpause arsnova-v3-open-weight-llm · docker stop|start arsnova-v3-open-weight-llm
+Kill-Switch (4C): docker compose up -d app   (ohne npm run docker:up:llm → OPEN_WEIGHT_LLM_ENABLED=false)
+Zurück:           npm run docker:up:llm
+Alles stoppen:    docker compose --profile llm down

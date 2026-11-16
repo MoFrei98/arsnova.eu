@@ -1,0 +1,52 @@
+==> Repo bereit: /home/mofrei/arsnova.eu · referat/thema-4 @ ba2909d5 · Basis v1.3.0
+
+==> 1/7 Umgebung prüfen
+    ok: Docker 29.9.3 · 5.7.0
+
+==> 2/7 Release-Stand prüfen
+    ok: v1.3.0 plus nur Labordateien (referat/thema-4 @ ba2909d5), LF-Zeilenenden
+
+==> 3/7 Node 24.18.0 über nvm
+v24.18.0 is already installed.
+    ok: Node v24.18.0
+
+==> 4/7 Modell prüfen (SHA-256 laut docker/open-weight-llm/model-manifest.json)
+Qwen3-4B-Instruct-2507-Q4_K_M.gguf: verified 2497281120 bytes, sha256:3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597
+    ok: Modell verifiziert
+
+==> 5/7 Netzwerkfreie Vorprüfung des Referenzfalls
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/mofrei/arsnova.eu/apps/frontend/node_modules/@trpc/client/dist/index.mjs' imported from /home/mofrei/arsnova.eu/scripts/load/lib/trpc-runtime.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at node:internal/modules/esm/loader:632:32
+    at TracingChannel.tracePromise (node:diagnostics_channel:362:14) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///home/mofrei/arsnova.eu/apps/frontend/node_modules/@trpc/client/dist/index.mjs'
+}
+
+Node.js v24.18.0
+✖ scripts/load/issue-456-demo-acceptance.test.mjs (26.611153ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31.131424
+
+✖ failing tests:
+
+test at scripts/load/issue-456-demo-acceptance.test.mjs:1:1
+✖ scripts/load/issue-456-demo-acceptance.test.mjs (26.611153ms)
+  'test failed'

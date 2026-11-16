@@ -1,0 +1,1 @@
+arsnova-v3-open-weight-llm  | 9.02.712.055 W srv          stop: cancel task, id_task = 1

@@ -1,0 +1,6 @@
+arsnova-v3-app  | qa_summary:completed {
+arsnova-v3-app  |   status: 'uncertain',
+arsnova-v3-app  |   effectiveMode: 'extractive',
+arsnova-v3-app  |   fallbackReason: 'timeout',
+arsnova-v3-app  |   latencyMs: 8321
+arsnova-v3-app  | }
