@@ -16,7 +16,8 @@
 # geprüfte Download auf F:) und nur notfalls neu geladen.
 #
 # Idempotent: erledigte Schritte werden übersprungen. Ändert keinen Releasecode.
-# Einzige Laborabweichung: docker-compose.override.yml (QA_SUMMARY_ENABLED=true).
+# Laborabweichung: docker-compose.override.yml (QA_SUMMARY_ENABLED=true, dazu lokale
+# Start-Secrets aus .env, weil die App im Compose-Pfad mit NODE_ENV=production läuft).
 # Ziel ist ausschließlich 127.0.0.1 – niemals gegen arsnova.eu testen.
 set -euo pipefail
 
@@ -113,6 +114,18 @@ npm run --silent load:issue-456:validate
 ok "Issue-#456-Szenario valide"
 
 step "7/8 Stack bauen und starten (App + Postgres + Redis + Runtime, Profil llm)"
+# Laborsecrets für den Produktionsstart der App (siehe docker-compose.override.yml).
+# Nur ergänzen, nie überschreiben; .env ist gitignoriert.
+touch .env
+if ! grep -q '^JWT_SECRET=' .env; then
+  printf 'JWT_SECRET=%s\n' "$(openssl rand -hex 32)" >> .env
+  printf '    Laborsecret JWT_SECRET in .env erzeugt\n'
+fi
+if ! grep -q '^CAPABILITY_ENVELOPE_KEY_BASE64=' .env; then
+  printf 'CAPABILITY_ENVELOPE_KEY_BASE64=%s\n' "$(openssl rand -base64 32)" >> .env
+  printf '    Laborsecret CAPABILITY_ENVELOPE_KEY_BASE64 in .env erzeugt\n'
+fi
+git check-ignore -q .env || fail ".env ist nicht gitignoriert – Abbruch, damit keine Secrets ins Repo geraten."
 printf '    Erster Build dauert mehrere Minuten (App-Image, llama.cpp-Image).\n'
 npm run docker:up:llm
 printf '    Warte auf App-Health'
@@ -139,7 +152,8 @@ step "8/8 Referenzmanifest schreiben → lab-thema4/referenzmanifest.md"
   echo "## Release"
   echo "- Basis: v1.3.0 / $EXPECTED_COMMIT"
   echo "- Laborstand: $(git rev-parse --abbrev-ref HEAD) @ $(git rev-parse HEAD) (über v1.3.0 hinaus nur docker-compose.override.yml und lab-thema4/)"
-  echo "- Laborabweichung: docker-compose.override.yml (QA_SUMMARY_ENABLED=true)"
+  echo "- Laborabweichung fachlich: docker-compose.override.yml (QA_SUMMARY_ENABLED=true)"
+  echo "- Laborabweichung betrieblich: zufällige lokale JWT_SECRET und CAPABILITY_ENVELOPE_KEY_BASE64 aus .env (Release-Compose setzt sie nicht, App startet mit NODE_ENV=production sonst nicht)"
   echo
   echo "## Hardware (WSL-Sicht)"
   echo "- CPU: $(lscpu | sed -n 's/^Model name:[[:space:]]*//p') · $(nproc) logische CPUs für WSL"

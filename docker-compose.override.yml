@@ -4,13 +4,22 @@
 # dort gilt der Releasedefault QA_SUMMARY_ENABLED=false. Docker Compose lädt diese
 # Datei automatisch zusätzlich zu docker-compose.yml.
 #
-# Einzige bewusste Abweichung von der Baseline: QA_SUMMARY_ENABLED=true.
+# Fachliche Abweichung von der Baseline: nur QA_SUMMARY_ENABLED=true.
 # QA_SUMMARY_TIMEOUT_MS wird nur durchgereicht; ohne Angabe gilt der Releasedefault
 # 8000 ms. Für die 4C-Variante gezielt setzen, z. B.:
 #   QA_SUMMARY_TIMEOUT_MS=30000 npm run docker:up:llm
 # Rückweg zur Baseline: denselben Befehl ohne die Variable ausführen.
+#
+# Betriebliche Ergänzung: Der App-Container läuft mit NODE_ENV=production. Dann
+# verlangt das Backend beim Start JWT_SECRET (bzw. YJS_SHARE_TOKEN_SECRET, ≥32 Byte)
+# und CAPABILITY_ENVELOPE_KEY_BASE64 (32 Byte), siehe apps/backend/src/index.ts:52–53.
+# docker-compose.yml am Release-Tag setzt beide nicht, ohne sie startet die App in
+# einer Neustartschleife. lab-thema4/setup-wsl.sh erzeugt zufällige Laborwerte in der
+# gitignorierten .env; hier stehen keine Secrets.
 services:
   app:
     environment:
       QA_SUMMARY_ENABLED: ${QA_SUMMARY_ENABLED:-true}
       QA_SUMMARY_TIMEOUT_MS: ${QA_SUMMARY_TIMEOUT_MS:-8000}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET fehlt – lab-thema4/setup-wsl.sh legt .env an}
+      CAPABILITY_ENVELOPE_KEY_BASE64: ${CAPABILITY_ENVELOPE_KEY_BASE64:?CAPABILITY_ENVELOPE_KEY_BASE64 fehlt – lab-thema4/setup-wsl.sh legt .env an}
