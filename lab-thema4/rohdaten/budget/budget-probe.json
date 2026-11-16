@@ -1,0 +1,53 @@
+{
+  "profile": {
+    "modelProfile": "qwen3-4b-instruct-2507-q4_k_m:ctx-4096:summary-v2",
+    "contextWindowTokens": 4096,
+    "reservedOutputTokens": 640,
+    "safetyMarginTokens": 128,
+    "estimator": "1 UTF-8-Byte = 1 Token (estimateModerationPromptUtf8Tokens)"
+  },
+  "minimal": {
+    "packed4096": {
+      "instructionTokens": 314,
+      "definitionTokens": 203,
+      "dataTokens": 2761,
+      "packedInputTokens": 3278,
+      "freeAfterPacking": 50,
+      "sources": 1,
+      "sourceKinds": [
+        "qa-question"
+      ],
+      "truncations": []
+    },
+    "unboundedWindow": {
+      "dataTokens": 2761,
+      "packedInputTokens": 3278,
+      "sources": 1
+    }
+  },
+  "reference_six_questions": {
+    "packed4096": {
+      "instructionTokens": 314,
+      "definitionTokens": 203,
+      "dataTokens": 2621,
+      "packedInputTokens": 3138,
+      "freeAfterPacking": 190,
+      "sources": 1,
+      "sourceKinds": [
+        "qa-question"
+      ],
+      "truncations": [
+        {
+          "section": "questions",
+          "omittedItems": 5,
+          "reason": "token-budget"
+        }
+      ]
+    },
+    "unboundedWindow": {
+      "dataTokens": 12130,
+      "packedInputTokens": 12647,
+      "sources": 12
+    }
+  }
+}

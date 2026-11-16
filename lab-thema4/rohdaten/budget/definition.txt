@@ -1,0 +1,1 @@
+Use moderation-prompt-definitions-v1: votes, scores and frequency are not learning, quality or people; PENDING is release status; derived, manual and confirmed objectives differ; omitted data is unknown.

@@ -1,0 +1,7 @@
+file	utf8_bytes	qwen_tokens	bytes_per_token
+instruction.txt	314	60	5.23
+definition.txt	203	41	4.95
+packed-4096-minimal.json	2761	702	3.93
+packed-4096-reference_six_questions.json	2621	674	3.89
+packed-unbounded-minimal.json	2761	702	3.93
+packed-unbounded-reference_six_questions.json	12130	4153	2.92
