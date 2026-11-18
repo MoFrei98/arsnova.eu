@@ -1,0 +1,16 @@
+== vor C2b-Wiederholung
+QuizLearningObjectiveBundle | 0 | -
+QuizLearningObjective | 0 | -
+SessionLearningObjective | 7 | 102326c4547cfac5e342d527aa87b0b9
+== nach C2b-Wiederholung
+QuizLearningObjectiveBundle | 0 | -
+QuizLearningObjective | 0 | -
+SessionLearningObjective | 7 | 102326c4547cfac5e342d527aa87b0b9
+== nach Kill-Switch
+QuizLearningObjectiveBundle | 0 | -
+QuizLearningObjective | 0 | -
+SessionLearningObjective | 7 | 102326c4547cfac5e342d527aa87b0b9
+== nach Rückweg
+QuizLearningObjectiveBundle | 0 | -
+QuizLearningObjective | 0 | -
+SessionLearningObjective | 7 | 102326c4547cfac5e342d527aa87b0b9

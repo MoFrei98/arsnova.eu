@@ -1,0 +1,202 @@
+ Image arsnova-open-weight-llm:llama-b10524 Building 
+ Image arsnovaeu-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 998B done
+#1 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 transferring dockerfile: 5.62kB done
+#2 DONE 0.0s
+
+#3 [open-weight-llm internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.25kB done
+#3 DONE 0.0s
+
+#4 [app internal] load metadata for docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#4 DONE 0.0s
+
+#5 [open-weight-llm internal] load metadata for ghcr.io/ggml-org/llama.cpp:server-b10524@sha256:57e505f69c3a55fa5dd9c15fced47cff7a899f5b5b504ea93d75b2f401b87830
+#5 DONE 0.0s
+
+#6 [app internal] load .dockerignore
+#6 transferring context: 123B done
+#6 DONE 0.0s
+
+#7 [open-weight-llm internal] load .dockerignore
+#7 transferring context: 2B done
+#7 DONE 0.0s
+
+#8 [app builder  1/17] FROM docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#8 resolve docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 0.0s done
+#8 DONE 0.0s
+
+#9 [open-weight-llm 1/4] FROM ghcr.io/ggml-org/llama.cpp:server-b10524@sha256:57e505f69c3a55fa5dd9c15fced47cff7a899f5b5b504ea93d75b2f401b87830
+#9 resolve ghcr.io/ggml-org/llama.cpp:server-b10524@sha256:57e505f69c3a55fa5dd9c15fced47cff7a899f5b5b504ea93d75b2f401b87830 0.0s done
+#9 DONE 0.0s
+
+#10 [open-weight-llm internal] load build context
+#10 transferring context: 173B done
+#10 DONE 0.0s
+
+#11 [open-weight-llm 3/4] COPY entrypoint.sh healthcheck.sh validate-bind.sh validate-token.sh model.sha256 /opt/arsnova/
+#11 CACHED
+
+#12 [open-weight-llm 2/4] RUN groupadd --gid 65532 arsnova-llm     && useradd --uid 65532 --gid 65532 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin arsnova-llm     && mkdir -p /opt/arsnova /run/open-weight-llm     && chown 65532:65532 /run/open-weight-llm
+#12 CACHED
+
+#13 [open-weight-llm 4/4] RUN chmod 0555 /opt/arsnova/entrypoint.sh /opt/arsnova/healthcheck.sh /opt/arsnova/validate-bind.sh /opt/arsnova/validate-token.sh     && chmod 0444 /opt/arsnova/model.sha256
+#13 CACHED
+
+#14 [app internal] load build context
+#14 transferring context: 192.75kB 0.1s done
+#14 DONE 0.1s
+
+#15 [app builder 15/17] COPY scripts/fix-esm-imports.mjs scripts/ensure-schema.mjs scripts/ensure-schema.d.mts scripts/
+#15 CACHED
+
+#16 [app builder 11/17] COPY apps/backend/ apps/backend/
+#16 CACHED
+
+#17 [app builder 17/17] RUN npm run build:localize -w @arsnova/frontend
+#17 CACHED
+
+#18 [app builder 14/17] RUN npx prisma generate
+#18 CACHED
+
+#19 [app production 15/22] COPY --from=builder /app/libs/session-export-report/dist libs/session-export-report/dist
+#19 CACHED
+
+#20 [app production 20/22] COPY scripts/pdf-worker-healthcheck.mjs /app/scripts/
+#20 CACHED
+
+#21 [app production  9/22] COPY prisma/ prisma/
+#21 CACHED
+
+#22 [app production 16/22] COPY --from=builder /app/libs/session-export-report/package.json libs/session-export-report/package.json
+#22 CACHED
+
+#23 [app production 19/22] COPY scripts/container-runtime-smoke.mjs /app/scripts/
+#23 CACHED
+
+#24 [app production 17/22] COPY --from=builder /app/apps/frontend/dist/browser apps/frontend/dist
+#24 CACHED
+
+#25 [app builder  6/17] COPY apps/backend/package.json apps/backend/
+#25 CACHED
+
+#26 [app production  6/22] COPY libs/session-export-report/package.json libs/session-export-report/
+#26 CACHED
+
+#27 [app production  8/22] RUN npm ci --omit=dev     && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+#27 CACHED
+
+#28 [app production 18/22] COPY scripts/docker-entrypoint.sh /app/scripts/
+#28 CACHED
+
+#29 [app builder  7/17] COPY apps/frontend/package.json apps/frontend/
+#29 CACHED
+
+#30 [app production 14/22] COPY --from=builder /app/libs/shared-types/package.json libs/shared-types/package.json
+#30 CACHED
+
+#31 [app builder  8/17] RUN npm ci
+#31 CACHED
+
+#32 [app builder  5/17] COPY libs/session-export-report/package.json libs/session-export-report/
+#32 CACHED
+
+#33 [app production 10/22] COPY prisma.config.ts tsconfig.json ./
+#33 CACHED
+
+#34 [app production  3/22] RUN apk upgrade --no-cache     && apk add --no-cache       chromium       nss       freetype       harfbuzz       ca-certificates       ttf-freefont       font-noto       'libssh>=0.12.1-r0'       'libcrypto3>=3.5.8-r0'       'libssl3>=3.5.8-r0'       'libexpat>=2.8.4-r0'       'libblkid>=2.42.3-r0'       'libmount>=2.42.3-r0'       'libuuid>=2.42.3-r0'
+#34 CACHED
+
+#35 [app builder 13/17] COPY prisma/ prisma/
+#35 CACHED
+
+#36 [app production 12/22] COPY --from=builder /app/apps/backend/dist apps/backend/dist
+#36 CACHED
+
+#37 [app builder 10/17] COPY libs/ libs/
+#37 CACHED
+
+#38 [app production 11/22] COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
+#38 CACHED
+
+#39 [app production  4/22] COPY package.json package-lock.json .npmrc ./
+#39 CACHED
+
+#40 [app builder  3/17] COPY package.json package-lock.json .npmrc ./
+#40 CACHED
+
+#41 [app production 21/22] COPY scripts/pdf-worker-runtime-smoke.mjs /app/scripts/
+#41 CACHED
+
+#42 [app production  5/22] COPY libs/shared-types/package.json libs/shared-types/
+#42 CACHED
+
+#43 [app builder  4/17] COPY libs/shared-types/package.json libs/shared-types/
+#43 CACHED
+
+#44 [app builder 12/17] COPY apps/frontend/ apps/frontend/
+#44 CACHED
+
+#45 [app builder 16/17] RUN npx tsc -b apps/backend/tsconfig.json     && node scripts/fix-esm-imports.mjs
+#45 CACHED
+
+#46 [app production 13/22] COPY --from=builder /app/libs/shared-types/dist libs/shared-types/dist
+#46 CACHED
+
+#47 [app production  7/22] COPY apps/backend/package.json apps/backend/
+#47 CACHED
+
+#48 [app builder  9/17] COPY tsconfig.json ./
+#48 CACHED
+
+#49 [app builder  2/17] WORKDIR /app
+#49 CACHED
+
+#50 [app production 22/22] RUN chmod +x /app/scripts/docker-entrypoint.sh     && mkdir -p /run/pdf-worker /run/spacy     && chown node:node /run/pdf-worker /run/spacy
+#50 CACHED
+
+#51 [open-weight-llm] exporting to image
+#51 exporting layers done
+#51 exporting manifest sha256:6d3e1eafbc78933f719fbcd5ba3e73b4d4fd978c42cfea6b7976973212322fad done
+#51 exporting config sha256:88a787b5b23ec456a6990e6e1d8595a37c9719e1e7cf37366de34d5a727fbd5a done
+#51 exporting attestation manifest sha256:734daaacc01abc65be8a4393059d039df7b32ea468f0976c3850d59e049f408a 0.0s done
+#51 exporting manifest list sha256:3e11949a1a6387fa5cd5c776d01be8d615ff384ea7bcd12772ec68fd7bc4ca91 0.0s done
+#51 naming to docker.io/library/arsnova-open-weight-llm:llama-b10524 done
+#51 unpacking to docker.io/library/arsnova-open-weight-llm:llama-b10524 done
+#51 DONE 0.1s
+
+#52 [app] exporting to image
+#52 exporting layers done
+#52 exporting manifest sha256:58a62a97cd24428925b463ba4ad2ae8eb32c1e4bf6979ea9a5692db83ca29dd7 done
+#52 exporting config sha256:d065e5dd5b85b9c9f31523af164e94b39b7cc4424d9f1d8e7b1c0c25df845a5d done
+#52 exporting attestation manifest sha256:706f41649793bea27613d06ecd556e3903925e79ad8d2c7d04c4525c11202b5e 0.0s done
+#52 exporting manifest list sha256:e450fdf1108547487919ed99a957693a231ab3db2c9313916cad147b31164043
+#52 exporting manifest list sha256:e450fdf1108547487919ed99a957693a231ab3db2c9313916cad147b31164043 0.0s done
+#52 naming to docker.io/library/arsnovaeu-app:latest done
+#52 unpacking to docker.io/library/arsnovaeu-app:latest done
+#52 DONE 0.1s
+
+#53 [open-weight-llm] resolving provenance for metadata file
+#53 DONE 0.0s
+
+#54 [app] resolving provenance for metadata file
+#54 DONE 0.0s
+ Image arsnova-open-weight-llm:llama-b10524 Built 
+ Image arsnovaeu-app Built 
+ Container arsnova-v3-open-weight-llm Running 
+ Container arsnova-v3-postgres Running 
+ Container arsnova-v3-redis Running 
+ Container arsnova-v3-app Recreate 
+ Container arsnova-v3-app Recreated 
+ Container arsnova-v3-postgres Waiting 
+ Container arsnova-v3-redis Waiting 
+ Container arsnova-v3-open-weight-llm Waiting 
+ Container arsnova-v3-postgres Healthy 
+ Container arsnova-v3-redis Healthy 
+ Container arsnova-v3-open-weight-llm Healthy 
+ Container arsnova-v3-app Starting 
+ Container arsnova-v3-app Started 

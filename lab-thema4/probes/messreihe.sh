@@ -276,11 +276,17 @@ bis_modell() {
 }
 
 # warte_stundenfenster: Session-Create-Limit (10/h je IP, festes Stundenfenster) abwarten
+# Das Budget ist ein festes Fenster ab der ersten Erstellung (Redis-Schlüssel mit EXPIRE 3600 s),
+# nicht die volle Stunde. Daher Zählerstand und Restlaufzeit direkt aus Redis lesen.
 warte_stundenfenster() {
-  local now next
-  now=$(date +%s); next=$(( (now / 3600 + 1) * 3600 + 20 ))
-  echo "Warte bis $(date -d "@$next" -Iseconds) auf ein neues Stundenfenster für Session-Erstellungen"
-  sleep $(( next - now ))
+  local key count ttl
+  key=$(docker exec arsnova-v3-redis redis-cli --scan --pattern 'rl:sessionCreate:ip:*' | head -1 | tr -d '\r')
+  if [ -z "$key" ]; then echo "Kein Session-Create-Zähler aktiv"; return 0; fi
+  count=$(docker exec arsnova-v3-redis redis-cli GET "$key" | tr -d '\r')
+  ttl=$(docker exec arsnova-v3-redis redis-cli TTL "$key" | tr -d '\r')
+  if [ "${count:-0}" -le 7 ]; then echo "Session-Create-Budget frei ($count/10)"; return 0; fi
+  echo "Session-Create-Zähler $count/10, Fenster endet in $ttl s – warte $(( ttl + 5 )) s"
+  sleep $(( ttl + 5 ))
 }
 
 # phase4b: Wiederholung von C2b, C3 und C4 (erster Durchlauf scheiterte an Host-Token-Ablauf
@@ -288,7 +294,7 @@ warte_stundenfenster() {
 phase4b() {
   mkdir -p "$R/04-aenderung"
   local start
-  [ -n "${SKIP_WAIT:-}" ] || warte_stundenfenster
+  warte_stundenfenster
   lo_snapshot 04-aenderung "vor C2b-Wiederholung"
   marke 04-aenderung "C2b-W Variante 30 s"
   QA_SUMMARY_TIMEOUT_MS=30000 npm run --silent docker:up:llm > "$R/04-aenderung/C2b-W-up.log" 2>&1
