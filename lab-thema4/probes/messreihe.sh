@@ -69,6 +69,24 @@ healthy() {
 
 flags() { docker exec "$APP" printenv QA_SUMMARY_TIMEOUT_MS OPEN_WEIGHT_LLM_ENABLED QA_SUMMARY_ENABLED | tr '\n' ' '; echo; }
 
+# bis_frei <ordner> <name>: fordert alle 2 s an, bis die Antwort nicht mehr `busy` ist.
+# Misst so, wann der Runtime-Slot nach einem Abbruch wieder frei ist. Busy-Antworten starten
+# keinen Modellauftrag; die erste Nicht-busy-Anfrage dagegen schon.
+bis_frei() {
+  local t0 i reason
+  t0=$(date +%s.%N)
+  for i in $(seq 1 45); do
+    hand "$1" "$2-$i" request 90000
+    reason=$(tail -n 1 "$R/$1/handsession.jsonl" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(String(JSON.parse(s).fallbackReason)))')
+    if [ "$reason" != "busy" ]; then
+      marke "$1" "$2 Slot frei nach $(node -e "console.log(($(date +%s.%N)-$t0).toFixed(1))") s, Versuch $i, Grund: $reason"
+      return 0
+    fi
+    sleep 2
+  done
+  marke "$1" "$2 Slot nach 45 Versuchen weiter belegt"
+}
+
 phase1() {
   mkdir -p "$R/01-baseline"
   echo "== V1 Helfer am Smoke-Lauf"; zeig "$R/00-smoke/issue456-20261116-141816.json"
@@ -93,6 +111,12 @@ phase1() {
 phase2() {
   mkdir -p "$R/02-stoerung"
   local start n
+  # Zusatztest B3 (nicht in der Checkliste, wegen Befund in B2): Slotfreigabe nach Queue-Timeout
+  start=$(date -Iseconds)
+  marke 01-baseline "B3 Anforderung ohne Störung"
+  hand 01-baseline "B3" request 60000
+  bis_frei 01-baseline "B3-danach"
+  logs 01-baseline B3 "$start"
   for n in 1 2 3; do
     start=$(date -Iseconds)
     marke 02-stoerung "S1-$n pause"
@@ -104,7 +128,7 @@ phase2() {
     docker unpause "$LLM" >/dev/null
     marke 02-stoerung "S1-$n unpause"
     hand 02-stoerung "S1-$n-frage" ask
-    hand 02-stoerung "S1-$n-nach-unpause" request 60000
+    bis_frei 02-stoerung "S1-$n-nach-unpause"
     logs 02-stoerung "S1-$n" "$start"
   done
   start=$(date -Iseconds)
@@ -134,7 +158,7 @@ phase2() {
     hand 02-stoerung "S3-$n" request 60000
     wait "$slot_pid"
     marke 02-stoerung "S3-$n Slot frei"
-    hand 02-stoerung "S3-$n-nach-frei" request 60000
+    bis_frei 02-stoerung "S3-$n-nach-frei"
     logs 02-stoerung "S3-$n" "$start"
   done
 }

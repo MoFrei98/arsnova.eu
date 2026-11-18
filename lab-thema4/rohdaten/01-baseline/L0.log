@@ -1,0 +1,127 @@
+{
+  "scenario": "qa-classroom",
+  "code": "6EFEAF",
+  "sessionId": "f23b48b6-abd4-4361-8e8e-1fb67d8d961c",
+  "participants": 30,
+  "qaConfiguredClosesAt": "2026-11-19T13:13:07.126Z",
+  "qaStartStatus": "ACTIVE",
+  "questionsPerParticipant": 3,
+  "expectedQuestions": 90,
+  "submittedQuestions": 90,
+  "submitPhase": {
+    "totalDurationMs": 340,
+    "p50Ms": 67,
+    "p95Ms": 175,
+    "maxMs": 203,
+    "replayed": 0,
+    "participantsAtExpectedQuota": 30,
+    "maxSessionQuestionCount": 90
+  },
+  "votesPerParticipant": {
+    "up": 3,
+    "down": 3
+  },
+  "expectedVotes": 180,
+  "votePhase": {
+    "accepted": 180,
+    "rejected": 0,
+    "totalDurationMs": 722
+  },
+  "hostModeration": {
+    "pin": 5,
+    "archive": 5,
+    "delete": 5,
+    "attempted": 15,
+    "accepted": 15,
+    "rejected": 0,
+    "errors": {},
+    "results": [
+      {
+        "questionId": "e737c474-a5e0-4e41-aa06-c6a4311d29b0",
+        "action": "PIN",
+        "status": "PINNED"
+      },
+      {
+        "questionId": "4436ef8e-06ca-435f-b3c2-fdd06cf728ed",
+        "action": "PIN",
+        "status": "PINNED"
+      },
+      {
+        "questionId": "648f9c3c-cf06-41bf-896f-0380f5523ea3",
+        "action": "PIN",
+        "status": "PINNED"
+      },
+      {
+        "questionId": "04a2c5e9-247b-497b-9149-584575502d2d",
+        "action": "PIN",
+        "status": "PINNED"
+      },
+      {
+        "questionId": "d27813e4-33ff-4e75-95d1-39fbd007d9f7",
+        "action": "PIN",
+        "status": "PINNED"
+      },
+      {
+        "questionId": "413dc8ea-3f23-4105-aea0-e04532fec877",
+        "action": "ARCHIVE",
+        "status": "ARCHIVED"
+      },
+      {
+        "questionId": "401cf1eb-a284-4d48-96d1-9e3d57f76e8f",
+        "action": "ARCHIVE",
+        "status": "ARCHIVED"
+      },
+      {
+        "questionId": "32209faa-37f7-4b1d-8075-88d1a0966e43",
+        "action": "ARCHIVE",
+        "status": "ARCHIVED"
+      },
+      {
+        "questionId": "1fa61da9-4182-4221-982f-817a4f10cbd1",
+        "action": "ARCHIVE",
+        "status": "ARCHIVED"
+      },
+      {
+        "questionId": "6404d735-137f-4f10-b371-5997606d0e15",
+        "action": "ARCHIVE",
+        "status": "ARCHIVED"
+      },
+      {
+        "questionId": "f36c6389-d142-441f-bf8f-43998cce0f14",
+        "action": "DELETE",
+        "status": "DELETED"
+      },
+      {
+        "questionId": "efdb70d0-415c-4d0a-b7b1-1d1434899f2b",
+        "action": "DELETE",
+        "status": "DELETED"
+      },
+      {
+        "questionId": "29ffae78-ed20-43cc-ae44-62ebebe10913",
+        "action": "DELETE",
+        "status": "DELETED"
+      },
+      {
+        "questionId": "6148109d-fcb7-4240-af72-402f096f414a",
+        "action": "DELETE",
+        "status": "DELETED"
+      },
+      {
+        "questionId": "270ed215-18b4-4796-8fb6-002a55fa853c",
+        "action": "DELETE",
+        "status": "DELETED"
+      }
+    ]
+  },
+  "finalStatusCounts": {
+    "PINNED": 5,
+    "ACTIVE": 75,
+    "ARCHIVED": 5
+  },
+  "hostListPages": 1,
+  "hostListTotalCount": 85,
+  "expectedVisibleAfterModeration": 85,
+  "visibleAfterModeration": 85
+}
+
+OK Q&A-Unterrichtsszenario (30 TN, Fragen + Votes + Moderation) bestanden.
