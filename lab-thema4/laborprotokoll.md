@@ -119,6 +119,24 @@ ein lokaler Runner mit gemeinsamer Quelladresse. Gesamtdauer 39,4 s.
 | Sechs-Fragen-Fixture, gepackt im 4.096er-Profil (1 von 6 Fragen) | 2.621 | 674 | 3,89 |
 | Sechs-Fragen-Fixture, voller Kontext ohne Fenstergrenze (12 Quellen) | 12.130 | 4.153 | 2,92 |
 
+## Schwellen der Messreihe (festgelegt am 18.11.2026 vor dem ersten Störlauf)
+
+Übernommen aus den Vorschlägen der Labor-Checkliste (Schlachtplan, Tab „Labor-Checkliste“).
+Es sind **eigene Prüfziele**, keine Release-SLOs; die Begründung im Handout steht noch aus.
+
+| Kürzel | Kriterium | Schwelle |
+| --- | --- | --- |
+| SW1 | Fallback sichtbar nach Störungsbeginn | höchstens Queue-Timeout + 1 s; bei Prozessausfall höchstens 1 s |
+| SW2 | Live-Pfade unter Störung | Q&A-p95 höchstens 20 % über L0, keine abgelehnten Beiträge oder Stimmen |
+| SW3 | Wiederaufnahme | erster Lauf ohne Fallback höchstens 60 s nach „Runtime healthy“ |
+| SW4 | Datenerhalt | Lernziele (count, revision) vor und nach dem Eingriff identisch |
+
+Ablauf und Werkzeuge der Messreihe: `lab-thema4/probes/messreihe.sh` (Phasen der Checkliste)
+und `lab-thema4/probes/handsession.mjs`. Die Handsession ist eine echte Q&A-Session mit den
+sechs Referenzfragen aus #456 §12 (A–F) und zwei Upvotes, bedient über dieselbe tRPC-API wie
+Host- und Teilnehmeransicht, statt per Hand im Browser. Abweichung von der Checkliste: sechs
+statt fünf Fragen.
+
 ## Laborabweichungen
 
 - **Fachlich:** `QA_SUMMARY_ENABLED=true` für den App-Container (Releasedefault `false`).
