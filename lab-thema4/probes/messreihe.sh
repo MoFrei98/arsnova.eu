@@ -288,7 +288,7 @@ warte_stundenfenster() {
 phase4b() {
   mkdir -p "$R/04-aenderung"
   local start
-  warte_stundenfenster
+  [ -n "${SKIP_WAIT:-}" ] || warte_stundenfenster
   lo_snapshot 04-aenderung "vor C2b-Wiederholung"
   marke 04-aenderung "C2b-W Variante 30 s"
   QA_SUMMARY_TIMEOUT_MS=30000 npm run --silent docker:up:llm > "$R/04-aenderung/C2b-W-up.log" 2>&1

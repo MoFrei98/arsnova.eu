@@ -25,3 +25,14 @@
 {"at":"2026-11-18T13:28:17.358Z","cmd":"ask","error":"Du kannst pro Session maximal 10 Fragen einreichen."}
 {"at":"2026-11-18T13:28:29.253Z","cmd":"ask","error":"Du kannst pro Session maximal 10 Fragen einreichen."}
 {"at":"2026-11-18T13:28:29.341Z","cmd":"request","enqueueHttp":401,"enqueueMs":19,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":19,"status":null}
+{"at":"2026-11-18T13:59:50.456Z","cmd":"create","error":"Zu viele Session-Erstellungen. Bitte später erneut versuchen."}
+{"at":"2026-11-18T13:59:50.700Z","cmd":"request","enqueueHttp":401,"enqueueMs":22,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":22,"status":null}
+{"at":"2026-11-18T13:59:50.790Z","cmd":"request","enqueueHttp":401,"enqueueMs":18,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":18,"status":null}
+{"at":"2026-11-18T13:59:50.879Z","cmd":"request","enqueueHttp":401,"enqueueMs":18,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":18,"status":null}
+{"at":"2026-11-18T13:59:50.970Z","cmd":"request","enqueueHttp":401,"enqueueMs":17,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":17,"status":null}
+{"at":"2026-11-18T13:59:56.370Z","cmd":"request","enqueueHttp":401,"enqueueMs":19,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":19,"status":null}
+{"at":"2026-11-18T13:59:56.508Z","cmd":"ask","error":"Du kannst pro Session maximal 10 Fragen einreichen."}
+{"at":"2026-11-18T13:59:56.595Z","cmd":"request","enqueueHttp":401,"enqueueMs":18,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":18,"status":null}
+{"at":"2026-11-18T14:00:02.090Z","cmd":"request","enqueueHttp":401,"enqueueMs":25,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":25,"status":null}
+{"at":"2026-11-18T14:00:02.180Z","cmd":"preview","http":401,"selectedMode":null,"fallback":null,"questionCorpus":null,"represented":null,"sourceCount":null,"packedInputTokens":null,"truncations":null}
+{"at":"2026-11-18T14:00:09.970Z","cmd":"request","enqueueHttp":401,"enqueueMs":24,"enqueueError":{"code":"UNAUTHORIZED","message":"Host-Session ungültig oder abgelaufen."},"enqueueStatus":null,"pollHttp":[],"totalMs":24,"status":null}

@@ -1,0 +1,6 @@
+rate_limit_429 {
+  path: 'session.create',
+  category: 'sessionCreate',
+  ipSource: 'express-req-ip',
+  suppressedSinceLastLog: 0
+}
