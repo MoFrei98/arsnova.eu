@@ -1,10 +1,10 @@
 # Referenzmanifest Labor Thema 4
 
-Erzeugt: 2026-11-16T14:16:46+01:00 durch lab-thema4/setup-wsl.sh
+Erzeugt: 2026-11-18T13:51:34+01:00 durch lab-thema4/setup-wsl.sh
 
 ## Release
 - Basis: v1.3.0 / 87c39334619fbcb0c5782b061da1ba0df0ba3142
-- Laborstand: referat/thema-4 @ 2558c8630542f174366348c145c0aa3006279782 (über v1.3.0 hinaus nur docker-compose.override.yml und lab-thema4/)
+- Laborstand: referat/thema-4 @ 67479dd4d2a8b2caa79844c6d6058d2d7521b5dd (über v1.3.0 hinaus nur docker-compose.override.yml und lab-thema4/)
 - Laborabweichung fachlich: docker-compose.override.yml (QA_SUMMARY_ENABLED=true)
 - Laborabweichung betrieblich: zufällige lokale JWT_SECRET und CAPABILITY_ENVELOPE_KEY_BASE64 aus .env (Release-Compose setzt sie nicht, App startet mit NODE_ENV=production sonst nicht)
 
@@ -15,10 +15,10 @@ Erzeugt: 2026-11-16T14:16:46+01:00 durch lab-thema4/setup-wsl.sh
 
 ## Container
 - Docker Engine 29.9.3
-- arsnova-v3-app: arsnovaeu-app (Up 5 seconds (healthy))
-- arsnova-v3-open-weight-llm: sha256:7dd403b7fe0f01f0aa7d0f60ab9abbd2a3155186569b034fa73b08a950ba8322 (Up 6 minutes (healthy))
-- arsnova-v3-postgres: postgres:16-alpine (Up 6 minutes (healthy))
-- arsnova-v3-redis: redis:7.4-alpine (Up 6 minutes (healthy))
+- arsnova-v3-app: arsnovaeu-app (Up 4 seconds (healthy))
+- arsnova-v3-open-weight-llm: arsnova-open-weight-llm:llama-b10524 (Up 11 seconds (healthy))
+- arsnova-v3-postgres: postgres:16-alpine (Up 10 seconds (healthy))
+- arsnova-v3-redis: redis:7.4-alpine (Up 10 seconds (healthy))
 - Runtime-Limits: CPUs=4000000000 (1e9 = 1 CPU), Memory=5368709120 B, PIDs=128
 
 ## Modell

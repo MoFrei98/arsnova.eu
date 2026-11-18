@@ -40,6 +40,25 @@ function saveState(state) {
   writeFileSync(STATE, JSON.stringify(state, null, 2), { mode: 0o600 });
 }
 
+// Das Host-Token läuft nach 15 min ab (HOST_SESSION_TTL_SECONDS). Wie die Host-Ansicht
+// (alle 10 min) holt der Treiber vor Ablauf ein neues über die Browser-Capability.
+const HOST_TOKEN_REFRESH_MS = 9 * 60 * 1000;
+async function hostHeaders(state, force = false) {
+  const age = Date.now() - (state.hostTokenIssuedAt ?? 0);
+  if (state.browserCapability && (force || age > HOST_TOKEN_REFRESH_MS)) {
+    const issued = await call('mutation', 'session.issueHostAccessToken', {
+      code: state.code,
+      browserCapability: state.browserCapability,
+    });
+    if (issued.data?.hostToken) {
+      state.hostToken = issued.data.hostToken;
+      state.hostTokenIssuedAt = Date.now();
+      saveState(state);
+    }
+  }
+  return { 'x-host-token': state.hostToken };
+}
+
 /** Roh-HTTP-Aufruf, damit HTTP-Status und Dauer sichtbar bleiben. */
 async function call(kind, procedure, input, headers) {
   const started = performance.now();
@@ -81,7 +100,7 @@ function describe(runtime) {
 
 async function create() {
   const publicTrpc = createHttpTrpcSingle(TRPC_URL);
-  const { code, hostToken, sessionId } = await publicTrpc.session.create.mutate({
+  const { code, hostToken, sessionId, hostBrowserCapability } = await publicTrpc.session.create.mutate({
     type: 'Q_AND_A',
     title: `Labor Thema 4 Handsession ${new Date().toISOString().slice(0, 16)}`,
     moderationMode: false,
@@ -105,7 +124,17 @@ async function create() {
     participants.push({ participantId: joined.participantId, capability: joined.rejoinToken });
   }
   await hostTrpc.session.startQa.mutate({ code });
-  const state = { code, sessionId, hostToken, participants, questions: [], votes: 0, asked: 0 };
+  const state = {
+    code,
+    sessionId,
+    hostToken,
+    hostTokenIssuedAt: Date.now(),
+    browserCapability: hostBrowserCapability,
+    participants,
+    questions: [],
+    votes: 0,
+    asked: 0,
+  };
   // Fragen A, C, E von Teilnehmer 1; B, D, F von Teilnehmer 2.
   for (let index = 0; index < REFERENCE_QUESTIONS.length; index += 1) {
     const author = participants[index % 2];
@@ -159,9 +188,14 @@ async function vote(state = loadState(), print = true) {
 
 async function request(maxWaitMs) {
   const state = loadState();
-  const headers = { 'x-host-token': state.hostToken };
-  const started = performance.now();
-  const enqueue = await call('mutation', 'qa.requestSummary', { sessionId: state.sessionId, locale: 'de' }, headers);
+  let headers = await hostHeaders(state);
+  let started = performance.now();
+  let enqueue = await call('mutation', 'qa.requestSummary', { sessionId: state.sessionId, locale: 'de' }, headers);
+  if (enqueue.httpStatus === 401 && state.browserCapability) {
+    headers = await hostHeaders(state, true);
+    started = performance.now();
+    enqueue = await call('mutation', 'qa.requestSummary', { sessionId: state.sessionId, locale: 'de' }, headers);
+  }
   let runtime = enqueue.data;
   const polls = [];
   while (runtime?.result?.status === 'pending' && performance.now() - started < maxWaitMs) {
@@ -184,17 +218,18 @@ async function request(maxWaitMs) {
 
 async function runtimeOnce() {
   const state = loadState();
-  const poll = await call('query', 'qa.summaryRuntime', { sessionId: state.sessionId }, {
-    'x-host-token': state.hostToken,
-  });
+  const poll = await call('query', 'qa.summaryRuntime', { sessionId: state.sessionId }, await hostHeaders(state));
   out({ cmd: 'runtime', http: poll.httpStatus, ms: poll.ms, error: poll.error, ...describe(poll.data) });
 }
 
 async function preview() {
   const state = loadState();
-  const result = await call('query', 'qa.summaryContextPreview', { sessionId: state.sessionId, locale: 'de' }, {
-    'x-host-token': state.hostToken,
-  });
+  const result = await call(
+    'query',
+    'qa.summaryContextPreview',
+    { sessionId: state.sessionId, locale: 'de' },
+    await hostHeaders(state),
+  );
   const p = result.data;
   out({
     cmd: 'preview',

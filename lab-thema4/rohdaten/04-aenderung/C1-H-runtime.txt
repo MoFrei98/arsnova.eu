@@ -1,0 +1,3 @@
+9.45.719.446 W srv          stop: cancel task, id_task = 2946
+10.15.264.799 W srv          stop: cancel task, id_task = 3267
+10.45.054.625 W srv          stop: cancel task, id_task = 3590

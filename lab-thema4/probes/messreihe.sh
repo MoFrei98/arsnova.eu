@@ -247,4 +247,86 @@ phase4() {
   echo "git status (WSL-Klon):"; git status --short | tee "$R/04-aenderung/C4-git-status.txt"
 }
 
-"${1:?phase1|phase2|phase3|phase4}"
+# lo_snapshot <ordner> <name>: Anzahl und Inhaltshash aller Lernziel-Tabellen (SW4)
+lo_snapshot() {
+  local t sql=""
+  for t in QuizLearningObjectiveBundle QuizLearningObjective SessionLearningObjective; do
+    sql+="select '$t' as tabelle, count(*) as zeilen, coalesce(md5(string_agg(x::text, '|' order by x::text)), '-') as inhalt from \"$t\" x union all "
+  done
+  sql="${sql% union all };"
+  echo "== $2" >> "$R/$1/lernziele-sw4.txt"
+  docker exec arsnova-v3-postgres psql -U arsnova_user -d arsnova_v3_dev -At -F ' | ' -c "$sql" \
+    | tee -a "$R/$1/lernziele-sw4.txt"
+}
+
+# bis_modell <ordner> <name>: nach Neustart alle 3 s anfordern, bis eine Anfrage die Runtime
+# wieder erreicht (Grund nicht unavailable, circuit_open oder busy). Misst die Wiederaufnahme.
+bis_modell() {
+  local t0 i reason
+  t0=$(date +%s.%N)
+  for i in $(seq 1 40); do
+    hand "$1" "$2-$i" request 90000
+    reason=$(tail -n 1 "$R/$1/handsession.jsonl" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(String(JSON.parse(s).fallbackReason)))')
+    case "$reason" in
+      unavailable|circuit_open|busy) sleep 3 ;;
+      *) marke "$1" "$2 Runtime erreicht nach $(node -e "console.log(($(date +%s.%N)-$t0).toFixed(1))") s ab healthy (Versuch $i, Ergebnis: $reason)"; return 0 ;;
+    esac
+  done
+  marke "$1" "$2 Runtime nach 40 Versuchen nicht erreicht"
+}
+
+# warte_stundenfenster: Session-Create-Limit (10/h je IP, festes Stundenfenster) abwarten
+warte_stundenfenster() {
+  local now next
+  now=$(date +%s); next=$(( (now / 3600 + 1) * 3600 + 20 ))
+  echo "Warte bis $(date -d "@$next" -Iseconds) auf ein neues Stundenfenster für Session-Erstellungen"
+  sleep $(( next - now ))
+}
+
+# phase4b: Wiederholung von C2b, C3 und C4 (erster Durchlauf scheiterte an Host-Token-Ablauf
+# und am Session-Create-Limit, beides Laborartefakte)
+phase4b() {
+  mkdir -p "$R/04-aenderung"
+  local start
+  warte_stundenfenster
+  lo_snapshot 04-aenderung "vor C2b-Wiederholung"
+  marke 04-aenderung "C2b-W Variante 30 s"
+  QA_SUMMARY_TIMEOUT_MS=30000 npm run --silent docker:up:llm > "$R/04-aenderung/C2b-W-up.log" 2>&1
+  healthy "$APP" 240 >/dev/null; echo -n "Flags (Timeout, LLM, Summary): "; flags | tee -a "$R/04-aenderung/zeitstempel.txt"
+  marke 04-aenderung "C2b-W neue Handsession"
+  hand 04-aenderung "C2b-W-create" create
+  start=$(date -Iseconds)
+  marke 04-aenderung "C2b-W stop"
+  docker stop "$LLM" >/dev/null
+  for n in 1 2 3 4; do hand 04-aenderung "C2b-W-stop-$n" request 90000; done
+  marke 04-aenderung "C2b-W start"
+  docker start "$LLM" >/dev/null
+  marke 04-aenderung "C2b-W healthy nach $(healthy "$LLM") s"
+  bis_modell 04-aenderung "C2b-W-nach"
+  hand 04-aenderung "C2b-W-frage" ask
+  hand 04-aenderung "C2b-W-folge" request 90000
+  logs 04-aenderung C2b-W "$start"
+  lo_snapshot 04-aenderung "nach C2b-Wiederholung"
+  # C3: Kill-Switch
+  marke 04-aenderung "C3-W Kill-Switch an"
+  OPEN_WEIGHT_LLM_ENABLED=false docker compose up -d app > "$R/04-aenderung/C3-W-up.log" 2>&1
+  sleep 5; healthy "$APP" 240 >/dev/null; echo -n "Flags (Timeout, LLM, Summary): "; flags | tee -a "$R/04-aenderung/zeitstempel.txt"
+  start=$(date -Iseconds)
+  hand 04-aenderung "C3-W-H" request 60000
+  hand 04-aenderung "C3-W-H-preview" preview
+  logs 04-aenderung C3-W-H "$start"
+  lauf 04-aenderung C3-W-1
+  lo_snapshot 04-aenderung "nach Kill-Switch"
+  # C4: Rückweg zur Baseline
+  marke 04-aenderung "C4-W Rückweg"
+  npm run --silent docker:up:llm > "$R/04-aenderung/C4-W-up.log" 2>&1
+  sleep 5; healthy "$APP" 240 >/dev/null; echo -n "Flags (Timeout, LLM, Summary): "; flags | tee -a "$R/04-aenderung/zeitstempel.txt"
+  start=$(date -Iseconds)
+  hand 04-aenderung "C4-W-H" request 60000
+  logs 04-aenderung C4-W-H "$start"
+  lauf 04-aenderung C4-W-1
+  lo_snapshot 04-aenderung "nach Rückweg"
+  echo "git status (WSL-Klon):"; git status --short | tee "$R/04-aenderung/C4-W-git-status.txt"
+}
+
+"${1:?phase1|phase2|phase3|phase4|phase4b|s3wdh}"

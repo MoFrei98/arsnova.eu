@@ -1,0 +1,389 @@
+{
+  "schemaVersion": 1,
+  "scenario": "issue-456-demo-acceptance",
+  "timestamp": "2026-11-18T13:25:14.287Z",
+  "environment": {
+    "target": "http://127.0.0.1:3000",
+    "canonicalDemoQuiz": "apps/frontend/src/assets/demo/quiz-demo-showcase.de.json",
+    "participants": 250,
+    "questionsPerParticipant": 10,
+    "expectedQaQuestions": 2500,
+    "networkModel": "single-local-runner-shared-source-address"
+  },
+  "metrics": {
+    "scenario": "issue-456-demo-acceptance",
+    "participants": 250,
+    "questions": 13,
+    "expectedVotes": 3500,
+    "totalVotesAccepted": 3250,
+    "feedbackAccepted": 250,
+    "finishedStatus": "FINISHED",
+    "durationMs": 71027,
+    "qa": {
+      "expected": 2500,
+      "accepted": 2500,
+      "rejected": 0,
+      "totalDurationMs": 15851,
+      "p50Ms": 27,
+      "p95Ms": 832,
+      "maxMs": 6648
+    },
+    "quickFeedback": {
+      "type": "TEMPO",
+      "expected": 250,
+      "accepted": 250,
+      "totalDurationMs": 186,
+      "p50Ms": 18,
+      "p95Ms": 23,
+      "maxMs": 25
+    },
+    "learningObjectives": {
+      "count": 1,
+      "revision": 1
+    },
+    "contextPreview": {
+      "schemaVersion": 1,
+      "contractVersion": "qa-summary-context-preview-v1",
+      "promptContextContract": "moderation-prompt-context-v1",
+      "snapshotHash": "95faf67397dcd560bc7fd5dda873b0b0bf40046d3a4bcbe489998da719013458",
+      "instructionVersion": "qa-summary-technical-handoff-v1",
+      "definitionVersion": "moderation-prompt-definitions-v1",
+      "selectedMode": "full-context",
+      "cache": "miss",
+      "adapterId": "arsnova-summary-adapter-v2",
+      "sourceCount": 0,
+      "fallback": null,
+      "sections": {
+        "questions": "available",
+        "topics": "disabled",
+        "compass": "unavailable",
+        "learningContext": "unavailable",
+        "releasedResults": "not-released",
+        "feedback": "not-applicable"
+      },
+      "questionCorpus": {
+        "total": 2500,
+        "eligible": 2500,
+        "analyzed": 200,
+        "deduplicated": 50,
+        "represented": 0
+      },
+      "budget": {
+        "modelProfile": "qwen3-4b-instruct-2507-q4_k_m:ctx-4096:summary-v2",
+        "contextWindowTokens": 4096,
+        "packedInputTokens": 3066,
+        "reservedOutputTokens": 640,
+        "safetyMarginTokens": 128,
+        "truncations": [
+          {
+            "section": "questions",
+            "omittedItems": 150,
+            "reason": "deduplication"
+          },
+          {
+            "section": "questions",
+            "omittedItems": 50,
+            "reason": "token-budget"
+          }
+        ]
+      },
+      "limitationCodes": [
+        "budget-truncated",
+        "budget-truncated"
+      ]
+    },
+    "summary": {
+      "schemaVersion": 2,
+      "enabled": true,
+      "inferenceConfigured": true,
+      "adapterId": "arsnova-summary-adapter-v2",
+      "resultContract": "qa-summary-result-v2",
+      "status": "uncertain",
+      "effectiveMode": "extractive",
+      "enqueueDurationMs": 163,
+      "totalDurationMs": 30745,
+      "fallback": {
+        "mode": "extractive",
+        "reason": "timeout"
+      }
+    },
+    "hotpathReads": {
+      "requests": 25,
+      "accepted": 25,
+      "p50Ms": 17,
+      "p95Ms": 18,
+      "maxMs": 18
+    },
+    "networkModel": "single-local-runner-shared-source-address",
+    "questionResults": [
+      {
+        "questionNumber": 1,
+        "order": 0,
+        "type": "SURVEY",
+        "openedAs": "ACTIVE",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 510,
+            "p50Ms": 399,
+            "p95Ms": 501,
+            "maxMs": 509
+          }
+        ]
+      },
+      {
+        "questionNumber": 2,
+        "order": 1,
+        "type": "FREETEXT",
+        "openedAs": "ACTIVE",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 430,
+            "p50Ms": 334,
+            "p95Ms": 424,
+            "maxMs": 428
+          }
+        ]
+      },
+      {
+        "questionNumber": 3,
+        "order": 2,
+        "type": "NUMERIC_ESTIMATE",
+        "openedAs": "ACTIVE",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 502,
+            "p50Ms": 397,
+            "p95Ms": 496,
+            "maxMs": 499
+          }
+        ]
+      },
+      {
+        "questionNumber": 4,
+        "order": 3,
+        "type": "SINGLE_CHOICE",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 517,
+            "p50Ms": 399,
+            "p95Ms": 509,
+            "maxMs": 514
+          }
+        ]
+      },
+      {
+        "questionNumber": 5,
+        "order": 4,
+        "type": "MULTIPLE_CHOICE",
+        "openedAs": "ACTIVE",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 492,
+            "p50Ms": 360,
+            "p95Ms": 480,
+            "maxMs": 488
+          }
+        ]
+      },
+      {
+        "questionNumber": 6,
+        "order": 5,
+        "type": "SINGLE_CHOICE",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 476,
+            "p50Ms": 354,
+            "p95Ms": 466,
+            "maxMs": 473
+          }
+        ]
+      },
+      {
+        "questionNumber": 7,
+        "order": 6,
+        "type": "SINGLE_CHOICE",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 479,
+            "p50Ms": 366,
+            "p95Ms": 471,
+            "maxMs": 477
+          }
+        ]
+      },
+      {
+        "questionNumber": 8,
+        "order": 7,
+        "type": "SHORT_TEXT",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 0,
+            "rejected": 250,
+            "totalDurationMs": 151,
+            "p50Ms": 134,
+            "p95Ms": 148,
+            "maxMs": 148
+          }
+        ]
+      },
+      {
+        "questionNumber": 9,
+        "order": 8,
+        "type": "NUMERIC_ESTIMATE",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 433,
+            "p50Ms": 323,
+            "p95Ms": 430,
+            "maxMs": 432
+          },
+          {
+            "round": 2,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 448,
+            "p50Ms": 363,
+            "p95Ms": 443,
+            "maxMs": 446
+          }
+        ]
+      },
+      {
+        "questionNumber": 10,
+        "order": 9,
+        "type": "ORDERING",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 443,
+            "p50Ms": 334,
+            "p95Ms": 440,
+            "maxMs": 442
+          }
+        ]
+      },
+      {
+        "questionNumber": 11,
+        "order": 10,
+        "type": "MATCHING",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 451,
+            "p50Ms": 341,
+            "p95Ms": 448,
+            "maxMs": 450
+          }
+        ]
+      },
+      {
+        "questionNumber": 12,
+        "order": 11,
+        "type": "CATEGORIZATION",
+        "openedAs": "QUESTION_OPEN",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 437,
+            "p50Ms": 325,
+            "p95Ms": 433,
+            "maxMs": 437
+          }
+        ]
+      },
+      {
+        "questionNumber": 13,
+        "order": 12,
+        "type": "RATING",
+        "openedAs": "ACTIVE",
+        "resultsStatus": "RESULTS",
+        "expectedVotesPerRound": 250,
+        "voteRounds": [
+          {
+            "round": 1,
+            "accepted": 250,
+            "rejected": 0,
+            "totalDurationMs": 431,
+            "p50Ms": 335,
+            "p95Ms": 424,
+            "maxMs": 429
+          }
+        ]
+      }
+    ]
+  },
+  "assertions": [
+    {
+      "name": "failure-1",
+      "passed": false,
+      "message": "Votes: 3250/3500 akzeptiert."
+    },
+    {
+      "name": "failure-2",
+      "passed": false,
+      "message": "Frage 8 Runde 1: 0/250 Votes."
+    }
+  ]
+}
