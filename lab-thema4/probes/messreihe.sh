@@ -144,24 +144,31 @@ phase2() {
   marke 02-stoerung "S2 start"
   docker start "$LLM" >/dev/null
   marke 02-stoerung "S2 Runtime healthy nach $(healthy "$LLM") s"
-  for n in 1 2 3; do
-    start=$(date -Iseconds)
-    local token; token=$(docker exec "$APP" printenv OPEN_WEIGHT_LLM_TOKEN)
-    marke 02-stoerung "S3-$n Slot belegt"
-    docker exec "$LLM" curl -sS --unix-socket /run/open-weight-llm/llm.sock \
-      -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
-      -d '{"messages":[{"role":"user","content":"Zähle von 1 bis 400, jede Zahl ausgeschrieben."}],"max_tokens":600,"chat_template_kwargs":{"enable_thinking":false}}' \
-      http://localhost/v1/chat/completions > /dev/null 2>&1 &
-    local slot_pid=$!
-    sleep 3
-    hand 02-stoerung "S3-$n" ask >/dev/null
-    hand 02-stoerung "S3-$n" request 60000
-    wait "$slot_pid"
-    marke 02-stoerung "S3-$n Slot frei"
-    bis_frei 02-stoerung "S3-$n-nach-frei"
-    logs 02-stoerung "S3-$n" "$start"
-  done
+  for n in 1 2 3; do s3run "S3-$n"; done
 }
+
+# s3run <name>: belegt den einzigen Runtime-Slot mit einer langen Anfrage und fordert währenddessen an
+s3run() {
+  local start token slot_pid
+  start=$(date -Iseconds)
+  token=$(docker exec "$APP" printenv OPEN_WEIGHT_LLM_TOKEN)
+  marke 02-stoerung "$1 Slot belegt"
+  docker exec "$LLM" curl -sS --unix-socket /run/open-weight-llm/llm.sock \
+    -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
+    -d '{"messages":[{"role":"user","content":"Zähle von 1 bis 400, jede Zahl ausgeschrieben."}],"max_tokens":600,"chat_template_kwargs":{"enable_thinking":false}}' \
+    http://localhost/v1/chat/completions > /dev/null 2>&1 &
+  slot_pid=$!
+  sleep 3
+  hand 02-stoerung "$1" ask >/dev/null
+  hand 02-stoerung "$1" request 60000
+  wait "$slot_pid"
+  marke 02-stoerung "$1 Slot frei"
+  bis_frei 02-stoerung "$1-nach-frei"
+  logs 02-stoerung "$1" "$start"
+}
+
+# s3wdh: zusätzliche S3-Wiederholung (S3-1 lief noch in den offenen Circuit Breaker aus S2)
+s3wdh() { sleep 35; s3run "S3-4"; }
 
 phase3() {
   mkdir -p "$R/03-erkennung"

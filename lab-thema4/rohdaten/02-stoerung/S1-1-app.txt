@@ -1,0 +1,18 @@
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'timeout',
+  latencyMs: 8035
+}
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'timeout',
+  latencyMs: 7266
+}
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'timeout',
+  latencyMs: 8033
+}

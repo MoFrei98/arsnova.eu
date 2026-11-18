@@ -10,3 +10,5 @@
 2026-11-18T14:13:06+01:00 B2-3 angefordert
 2026-11-18T14:13:06+01:00 L0 Start
 2026-11-18T14:13:08+01:00 L0 Ende rc=0
+2026-11-18T14:14:46+01:00 B3 Anforderung ohne Störung
+2026-11-18T14:15:05+01:00 B3-danach Slot frei nach 10.8 s, Versuch 2, Grund: timeout
