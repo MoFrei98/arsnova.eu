@@ -1,0 +1,3 @@
+4.07.039.541 W slot   operator(): id  0 | task 2038 | need to evaluate at least 1 token for each active slot (n_past = 824, task.n_tokens() = 824)
+4.07.039.560 W slot   operator(): id  0 | task 2038 | n_past was set to 823
+4.14.992.019 W srv          stop: cancel task, id_task = 2038
