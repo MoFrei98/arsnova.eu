@@ -1,0 +1,6 @@
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'disabled',
+  latencyMs: 47
+}

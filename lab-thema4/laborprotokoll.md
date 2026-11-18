@@ -35,7 +35,9 @@ Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 | C1 | 18.11. 14:21–14:27 | Variante 30 s | Großlage: 1 von 3 Läufen `full-context` (21,5 s); Handsession 3× `timeout` 30,1–30,2 s | [04-aenderung/](rohdaten/04-aenderung/) |
 | C2a | 18.11. 14:27 | Wiederaufnahme nach Pause, 30 s | `timeout` während und nach der Pause | [04-aenderung/](rohdaten/04-aenderung/) |
 | C2b, C3, C4 | 18.11. 14:27–14:29 | Stop, Kill-Switch, Rückweg | **ungültig**: Host-Token abgelaufen, Session-Create-Limit erreicht | [04-aenderung/](rohdaten/04-aenderung/) |
-| C2b-W, C3-W, C4-W | 18.11. ab 15:00 | Wiederholung | siehe [Phase 4b](#phase-4b--wiederholung-c2b-c3-c4) | [04-aenderung/](rohdaten/04-aenderung/) |
+| C2b-W | 18.11. 15:09–15:10 | Wiederaufnahme nach Stop, 30 s | Runtime nach 26,2 s ab healthy wieder erreicht (Breaker), dann `timeout`; kein Lauf ohne Fallback | [04-aenderung/](rohdaten/04-aenderung/) |
+| C3-W | 18.11. 15:10–15:11 | Kill-Switch | `disabled` sofort (0,38 s / 0,96 s), Live-Pfade wie B1 | [04-aenderung/](rohdaten/04-aenderung/) |
+| C4-W | 18.11. 15:11–15:12 | Rückweg 8 s | wie B1: `timeout` 8,96 s, 0 Fragen; `git status` leer | [04-aenderung/](rohdaten/04-aenderung/) |
 
 ## Chronik
 
@@ -287,22 +289,83 @@ Stundenfenster.
 
 ### Phase 4b – Wiederholung C2b, C3, C4
 
-*Läuft ab 15:00:20; Ergebnisse werden nach dem Lauf eingetragen.*
+Zwei Fehlversuche um 15:00 und 15:01 scheiterten erneut am Session-Create-Budget und sind unter
+`rohdaten/04-aenderung/fehlversuch-4b-1500/` bzw. `fehlversuch-4b-1501/` gesichert. Ursache:
+Das Budget ist ein festes Fenster ab der **ersten** Erstellung (Redis-Schlüssel
+`rl:sessionCreate:ip:…` mit `EXPIRE 3600`, hier 14:08:56 bis 15:08:56), nicht die volle Stunde.
+Die Doku nennt es „festes Stundenfenster“, der Code-Kommentar „Sliding-Window“. Der gültige
+Durchlauf startete um 15:08:52, nachdem das Skript Zählerstand und Restlaufzeit aus Redis gelesen
+hatte. Neue Handsession `F25QMD` (sechs Fragen A–F, zwei Upvotes).
 
-### Bewertung gegen die Schwellen (Stand nach Phase 4)
+**C2b-W – Wiederaufnahme nach Stop bei 30 s:**
+
+| Zeit (MEZ) | Ereignis | Ergebnis |
+| --- | --- | --- |
+| 15:09:03,5–15:09:04,7 | `docker stop`, Anfragen 1–3 | `unavailable` nach 355 / 322 / 318 ms |
+| 15:09:04,7 | Anfrage 4 | `circuit_open` nach 311 ms (Breaker offen seit dem 3. Fehler, 15:09:04,7) |
+| 15:09:05 | `docker start` | – |
+| 15:09:10 | Runtime healthy (6 s) | – |
+| 15:09:10,4–15:09:33,9 | 8 Anfragen im Abstand von rund 3,4 s | alle `circuit_open`, je rund 320 ms |
+| 15:09:36,6 | Anfrage 9, **26,2 s nach healthy**, 31,9 s nach Öffnen des Breakers | erreicht die Runtime wieder; `timeout` nach 30.268 ms |
+| 15:10:06,4 | Folgeanfrage mit neuer Frage | `timeout` nach 30.338 ms |
+
+Die Wiederaufnahme wird also nicht von der Runtime begrenzt (6 s), sondern vom Circuit Breaker
+(30 s ab dem dritten Fehler). Ein Lauf **ohne** Fallback kam nicht zustande; die Handsession
+erreicht auch bei 30 s nie ein Modellergebnis (wie in C1-H1..3).
+
+**C3-W – Kill-Switch** (`OPEN_WEIGHT_LLM_ENABLED=false docker compose up -d app`, Flags danach
+`8000 / false / true`):
+
+| Lauf | Summary | Dauer | Weiteres |
+| --- | --- | ---: | --- |
+| C3-W-H (Handsession) | `uncertain / extractive / disabled`, `retry: not-applicable`, `attemptedMode: null` | 381 ms | Kontextvorschau: `selectedMode: null`, Fallback `disabled` |
+| C3-W-1 (Großlage) | `uncertain / extractive / disabled` | 960 ms | 0 von 2.500; Q&A-p95 183 ms; Lernziele `{"count":1,"revision":1}`; Stimmen 3.250/3.500 (429-Artefakt) |
+
+Mit Kill-Switch erscheint der (leere) Fallback sofort und ohne Runtime-Aufruf; die Live-Pfade
+liegen im Bereich der Baseline.
+
+**C4-W – Rückweg** (`npm run docker:up:llm`, Flags `8000 / true / true`):
+
+| Lauf | Summary | Dauer | Weiteres |
+| --- | --- | ---: | --- |
+| C4-W-H (Handsession) | `uncertain / extractive / timeout` | 8.372 ms | wie B2-1 |
+| C4-W-1 (Großlage) | `uncertain / extractive / timeout` | 8.964 ms | 0 von 2.500; Q&A-p95 177 ms; Lernziele `{"count":1,"revision":1}` – gleiches Bild wie B1 |
+
+`git status` im WSL-Klon nach dem Rückweg: leer, keine geänderten Releasedateien.
+
+**SW4 – Lernziele in der Datenbank** (`lo_snapshot`, Rohdaten
+`rohdaten/04-aenderung/lernziele-sw4.txt`):
+
+| Zeitpunkt | `QuizLearningObjective*` | `SessionLearningObjective` |
+| --- | --- | --- |
+| vor C2b-W | 0 / 0 Einträge | 7 Einträge, Inhaltshash `102326c4…` |
+| nach C2b-W | 0 / 0 | 7, `102326c4…` |
+| nach Kill-Switch (C3-W) | 0 / 0 | 8, `d77bd1cd…` |
+| nach Rückweg (C4-W) | 0 / 0 | 9, `9abc959b…` |
+
+Die beiden neuen Einträge gehören zu den zwei neu angelegten Großlage-Sessions von C3-W-1
+(14:10:43 UTC) und C4-W-1 (14:11:39 UTC). Die 7 Einträge von vor Phase 4b haben nach dem Rückweg
+denselben Inhaltshash `102326c4…` (Nachprüfung mit `createdAt < 14:10:36 UTC`). Bestehende
+Lernziele wurden also weder durch Stop, 30-s-Variante, Kill-Switch noch Rückweg verändert.
+
+### Bewertung gegen die Schwellen
 
 | Schwelle | Messwerte | Ergebnis |
 | --- | --- | --- |
-| SW1 Fallback sichtbar | S1 8,21–8,34 s (≤ 9 s); S2 0,31–0,79 s (≤ 1 s); S3 0,33–0,34 s; C2a 30,33 s (≤ 31 s) | erfüllt |
+| SW1 Fallback sichtbar | S1 8,21–8,34 s (≤ 9 s); S2/C2b-W 0,31–0,79 s (≤ 1 s); S3 0,33–0,34 s; C2a 30,33 s (≤ 31 s); Kill-Switch 0,38 s | erfüllt |
 | SW2 Live-Pfade | L-S1 130 ms, L-S2 109 ms gegen L0 175 ms (Grenze 210 ms); 0 abgelehnte Fragen oder Stimmen | erfüllt |
-| SW3 Wiederaufnahme | siehe Phase 4b | offen |
-| SW4 Datenerhalt | siehe Phase 4b | offen |
+| SW3 Wiederaufnahme | Runtime 26,2 s nach healthy wieder erreicht (Breaker-Ende), aber **kein Lauf ohne Fallback**: Handsession auch bei 30 s immer `timeout` | **nicht erfüllt** (Kriterium „Lauf ohne Fallback“); Rückkehr zum Verhalten aus C1 nach 26,2 s |
+| SW4 Datenerhalt | Lernziele je Großlage `{1,1}` in B1, C1, C3-W, C4-W; DB-Inhaltshash der vorhandenen 7 Einträge vor und nach allen Eingriffen identisch | erfüllt |
 
-**Gesamtbefund bis hier:** Die Degradation ist technisch robust – jeder Fehler wird schnell und
-typisiert gemeldet, die Live-Pfade bleiben unbeeinflusst, der Circuit Breaker verhält sich wie
-spezifiziert. Fachlich liefert der Fallback in keinem einzigen Lauf Inhalt: Alle Kurzfassungen
-der Messreihe hatten 0 Aussagen und 0 Quellen. Bei 8 s erreicht kein Lauf das Modell erfolgreich;
-bei 30 s einer von sechs (C1-2), und auch er ist mangels Fragen im Kontext `uncertain`.
+**Gesamtbefund der Messreihe:** Die Degradation ist technisch robust – jeder Fehler wird
+schnell und typisiert gemeldet, die Live-Pfade bleiben unbeeinflusst, Circuit Breaker,
+Kill-Switch und Rückweg verhalten sich wie spezifiziert, bestehende Lernziele bleiben erhalten.
+Fachlich liefert der Fallback in keinem einzigen Lauf Inhalt: Alle Kurzfassungen der Messreihe
+hatten 0 Aussagen und 0 Quellen, weil weder die Großlage noch die Sechs-Fragen-Session eine
+einzige Frage ins 4.096er-Budget bekommt. Bei 8 s erreicht kein Lauf ein Modellergebnis; bei 30 s
+einer von zwölf (C1-2, Großlage, 21,5 s), und auch er ist mangels Fragen `uncertain`. Die
+Wiederaufnahme nach einem Ausfall dauert so lange wie der offene Circuit Breaker (≈ 30 s ab dem
+dritten Fehler), nicht so lange wie der Runtime-Neustart (6 s).
 
 ## Laborabweichungen
 
@@ -318,7 +381,7 @@ bei 30 s einer von sechs (C1-2), und auch er ist mangels Fragen im Kontext `unce
 
 ## Noch nicht gemessen / offen
 
-- Phase 4b (Wiederaufnahme nach Stop bei 30 s, Kill-Switch, Rückweg) – läuft.
+- Begründung der Schwellen SW1–SW4 fürs Handout.
 - Host-Ansicht im Browser: Zeitpunkt der Aktualisierung nach einer Stimmenänderung (E3) und
   HTTP-Status in den Entwicklertools (E2) nur per API bzw. Code belegt.
 - Ursache der höheren Q&A-p95 in C1-2/C1-3.

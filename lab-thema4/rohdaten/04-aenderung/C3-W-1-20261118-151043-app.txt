@@ -1,0 +1,18 @@
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'disabled',
+  latencyMs: 47
+}
+rate_limit_429 {
+  path: 'vote.submit',
+  category: 'vote',
+  ipSource: 'express-req-ip',
+  suppressedSinceLastLog: 0
+}
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'disabled',
+  latencyMs: 408
+}
