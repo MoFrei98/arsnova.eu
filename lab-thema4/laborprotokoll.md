@@ -143,8 +143,9 @@ ein lokaler Runner mit gemeinsamer Quelladresse. Gesamtdauer 39,4 s.
 
 ## Schwellen der Messreihe (festgelegt am 18.11.2026 vor dem ersten Störlauf)
 
-Übernommen aus den Vorschlägen der Labor-Checkliste (Schlachtplan, Tab „Labor-Checkliste“).
-Es sind **eigene Prüfziele**, keine Release-SLOs; die Begründung im Handout steht noch aus.
+Übernommen aus den Vorschlägen der Labor-Checkliste (Schlachtplan, Tab „Labor-Checkliste“) und
+vor dem ersten Störlauf committet (`d9857d52`, 18.11. 14:08:38). Es sind **eigene Prüfziele**;
+die Begründung folgt unten.
 
 | Kürzel | Kriterium | Schwelle |
 | --- | --- | --- |
@@ -152,6 +153,103 @@ Es sind **eigene Prüfziele**, keine Release-SLOs; die Begründung im Handout st
 | SW2 | Live-Pfade unter Störung | Q&A-p95 höchstens 20 % über L0, keine abgelehnten Beiträge oder Stimmen |
 | SW3 | Wiederaufnahme | erster Lauf ohne Fallback höchstens 60 s nach „Runtime healthy“ |
 | SW4 | Datenerhalt | Lernziele (count, revision) vor und nach dem Eingriff identisch |
+
+### Begründung der Schwellen (nachgetragen am 20.11.2026)
+
+**Zur Einordnung:** Die Schwellen wurden am 18.11. vor dem ersten Störlauf festgelegt und seither
+nicht verändert. Die Begründung ist erst nach der Messreihe ausgeschrieben worden. Sie stützt sich
+deshalb bewusst nur auf Release-Konfiguration, Release-Doku und allgemeine Quellen, nicht auf die
+gemessenen Werte. Entwurf: Claude; von Morris zu prüfen und im Handout zu übernehmen.
+
+**Release-SLOs:** Die 1.3-Betriebsdoku enthält SLOs nur für die Live-Prozeduren (ADR-0021,
+Betriebsstatus `stable`: p95 ≤ 1.000 ms, p99 ≤ 2.000 ms, Fehlerquote ≤ 0,5 % im rollierenden
+60-s-Fenster). Für die Moderationszusammenfassung, ihre Fallback-Zeit, die Wiederaufnahme nach
+einem Runtime-Ausfall und den Erhalt von Lernzielen gibt es keine. Laut Prüfungsleitfaden (4A,
+Gültigkeitsgrenze) werden Release-SLOs übernommen und eigene Prüfziele ausdrücklich begründet:
+SW1, SW3 und SW4 sind eigene Prüfziele, SW2 verschärft das Release-SLO für den Störungsfall.
+
+**SW1 – Fallback sichtbar: höchstens Queue-Timeout + 1 s, bei Prozessausfall höchstens 1 s**
+
+- *Bezug:* `QA_SUMMARY_TIMEOUT_MS` ist laut Release ein „Hartes Wall-Clock-Limit der
+  Summary-Queue“; ein Timeout „degradiert auf den extraktiven Backend-Fallback“
+  ([qa-summary.md:22](../docs/features/qa-summary.md#L22)). Für einen belegten Slot verlangt
+  ADR-0035 „sofort Fallback“ ([ADR-0035:133](../docs/architecture/decisions/0035-self-hosted-llm-runtime-llama-cpp-over-ollama.md#L133)).
+- *Begründung:* Der Timeout ist die Zusage des Releases, wann spätestens ein Ergebnis vorliegt;
+  die Schwelle prüft, ob diese Zusage unter Störung eingehalten wird. Die Toleranz von 1 s deckt
+  den Kontextaufbau vor und nach dem Lauf sowie das Abfrageintervall der Host-Ansicht (750 ms)
+  ab. Fehler, die ohne Warten erkennbar sind (Socket ohne Gegenstelle, belegter Slot, offener
+  Breaker), sollen sich wie eine unmittelbare Reaktion verhalten. Als Grenze dafür dient die
+  1-Sekunden-Schwelle, bis zu der eine Systemreaktion den Arbeitsfluss nicht unterbricht
+  (Card, Robertson & Mackinlay 1991; Nielsen 1993).
+- *Grenze:* Gemessen wird bis zum fertigen Ergebnis im API-Stand, nicht bis zur Wahrnehmung durch
+  die Lehrperson. Über den Inhalt des Fallbacks sagt SW1 nichts.
+
+**SW2 – Live-Pfade unter Störung: Q&A-p95 höchstens 20 % über L0, keine Ablehnungen**
+
+- *Bezug:* Leitplanke des Prüfungsleitfadens (4.1.1 Nr. 1: Join, Vote, Q&A-Einreichen und
+  WebSocket „warten weder auf Modelle noch auf einen aufwendigen Kontextaufbau“), Release-SLO aus
+  ADR-0021 und die Abbruchgrenze des Release-Lastskripts `qa-classroom-30` (Submit-p95 ≤ 1.000 ms).
+- *Begründung:* Die absolute Release-Grenze von 1.000 ms ist für den Störungsvergleich zu grob:
+  Bei einer Labor-Baseline um 200 ms bliebe selbst eine Verfünffachung unentdeckt. Deshalb ein
+  relativer Vergleich gegen die eigene Baseline L0 unter identischer Last (30 Teilnehmende,
+  90 Fragen, 180 Stimmen). Die 20 % sind eine pragmatische Toleranz für die Streuung eines lokalen
+  Lasttests, bei dem Lastgenerator und System dieselbe Maschine teilen – eine Konvention, keine
+  Norm. Liegt ein Wert darüber, wird das als Hinweis auf eine Kopplung zwischen optionaler
+  Analyse und Live-Betrieb gewertet. Bei den Ablehnungen gilt null Toleranz: Entkopplung heißt,
+  dass eine Störung der optionalen Analyse keinen einzigen Live-Request kostet. Das 0,5-%-Budget
+  aus ADR-0021 gehört dem Normalbetrieb, nicht der Analyse-Störung. Die SLO-Idee (messbares Ziel
+  je Nutzerpfad statt bloßer Erreichbarkeit) folgt Beyer et al. (2016, Kap. 4).
+- *Grenze:* je Störung ein Live-Lauf; ein p95 aus 90 Einreichungen streut. Die abgelehnten
+  Stimmen der Großlage (429 wegen gemeinsamer Quelladresse) sind ein Laborartefakt und nicht
+  Gegenstand von SW2.
+
+**SW3 – Wiederaufnahme: erster Lauf ohne Fallback höchstens 60 s nach „Runtime healthy“**
+
+- *Bezug:* Circuit Breaker 3 Fehler / 30 s offen
+  ([openWeightLlmConfig.ts:9–10](../apps/backend/src/lib/openWeightLlmConfig.ts#L9)), maximaler
+  Queue-Timeout 30 s ([qaSummaryConfig.ts:13](../apps/backend/src/lib/qaSummaryConfig.ts#L13)),
+  Prüfungsleitfaden 4A: Entscheidung über einen „sicheren Wiederanlauf ohne Wiederholungssturm“.
+- *Begründung:* 60 s ist die Summe der beiden dokumentierten Wartemechanismen: höchstens 30 s,
+  bis der Breaker schließt, plus höchstens ein Lauf bis zum maximalen Timeout von 30 s. Dauert die
+  Wiederaufnahme länger, ist sie nicht mehr durch das Design erklärt. Der Breaker selbst ist das
+  Muster gegen Wiederholungsstürme (Nygard 2018); SW3 prüft, ob er die Rückkehr nur so lange wie
+  vorgesehen verzögert. Zusätzlich die eigene Annahme: Eine Kurzfassung, die innerhalb einer
+  Minute wieder verfügbar ist, kann eine Lehrperson noch für dieselbe Diskussionsphase nutzen.
+- *Grenze:* SW3 setzt voraus, dass auf der Hardware überhaupt ein Lauf ohne Fallback möglich ist.
+  Das Kriterium mischt deshalb Wiederanlauf-Logik und Modellkapazität.
+
+**SW4 – Datenerhalt: Lernziele vor und nach dem Eingriff identisch**
+
+- *Bezug:* Vertrag der Lernzielableitung: „Ein Fehler, Busy, Abbruch, Timeout, Quellenkonflikt
+  oder Bundle-CAS-Konflikt verändert kein Lernziel“
+  ([learning-objective-derivation.md:63](../docs/features/learning-objective-derivation.md#L63));
+  Prüfungsleitfaden 4C: Rückweg „ohne Quellenbindung oder bestätigte Lernziele zu beschädigen“.
+- *Begründung:* Datenerhalt ist binär. Jede Veränderung bestehender Lernziele durch eine Störung,
+  einen Kill-Switch oder einen Rückweg wäre ein Fehler, eine Toleranz ergibt keinen Sinn.
+  Gemessen wurde über `count`/`revision` hinaus ein Inhaltshash aller Lernziel-Zeilen, weil
+  gleiche Zähler eine inhaltliche Änderung übersehen könnten.
+- *Grenze:* In der Messreihe gab es nur manuell angelegte Lernziele (eines je Großlage). Eine
+  erfolgreiche Ableitung durch das Modell lief nie; deren Schreibpfad ist nicht abgedeckt.
+
+**Was die Schwellen nicht abdecken:** Alle vier Kriterien messen technische Degradation. Dass
+in der gesamten Messreihe keine Kurzfassung eine Aussage enthielt, verletzt keine der Schwellen.
+Das ist kein Mangel der Auswertung, sondern selbst ein Befund für 4B: Laufzeit- und
+Verfügbarkeitskriterien belegen keine fachliche Brauchbarkeit (Prüfungsleitfaden 4B,
+Gültigkeitsgrenze). Ein inhaltliches Kriterium nachträglich einzuführen wäre methodisch
+unzulässig; im Handout wird es als Empfehlung für eine nächste Messreihe genannt.
+
+**Quellen zur Begründung** (Zitierweise nach myCampus-Leitfaden anpassen):
+
+- Beyer, B., Jones, C., Petoff, J. & Murphy, N. R. (Hrsg.) (2016). *Site Reliability Engineering:
+  How Google Runs Production Systems.* O'Reilly. Kap. 4 „Service Level Objectives“.
+- Card, S. K., Robertson, G. G. & Mackinlay, J. D. (1991). The Information Visualizer, an
+  Information Workspace. In *Proceedings of CHI '91*, 181–186. ACM.
+- Nielsen, J. (1993). *Usability Engineering.* Academic Press. Kap. 5, Antwortzeiten.
+- Nygard, M. T. (2018). *Release It! Design and Deploy Production-Ready Software* (2. Aufl.).
+  Pragmatic Bookshelf. Abschnitte zu Timeouts und Circuit Breaker.
+- Release-Quellen: ADR-0021 (Live-SLO), ADR-0035 (Runtime), `docs/features/qa-summary.md`,
+  `docs/features/learning-objective-derivation.md`, `openWeightLlmConfig.ts`, `qaSummaryConfig.ts`
+  am Tag `v1.3.0`; Prüfungsleitfaden `docs/didaktik/CLOUD-COMPUTING-REFERAT-PRUEFUNG.md`.
 
 Ablauf und Werkzeuge der Messreihe: `lab-thema4/probes/messreihe.sh` (Phasen der Checkliste)
 und `lab-thema4/probes/handsession.mjs`. Die Handsession ist eine echte Q&A-Session mit den
@@ -429,7 +527,8 @@ per Hand. E3 bleibt per API (Phase 3) und Code belegt.
 
 ## Noch nicht gemessen / offen
 
-- Begründung der Schwellen SW1–SW4 fürs Handout.
+- Begründung der Schwellen: Entwurf vom 20.11. liegt vor (siehe oben), Prüfung und Übernahme
+  ins Handout durch Morris; Literaturangaben gegen den myCampus-Leitfaden prüfen.
 - E3 in der Host-Ansicht: Zeitpunkt der Aktualisierung nach einer Stimmenänderung nur per API
   bzw. Code belegt; E2 (HTTP-Status) per Treiber statt in den Entwicklertools.
 - Saubere Browser-Baseline mit laufender Runtime (M-B lief versehentlich unter Pause). Laut API
