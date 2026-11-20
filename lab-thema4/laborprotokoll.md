@@ -9,7 +9,10 @@ Anweisung von Morris ausgeführt und protokolliert. Von Morris selbst ausgeführ
 von WSL und Docker Desktop, Annahme der Docker-Vereinbarung, Start des Stacks am 18.11.
 (`setup-wsl.sh` um 13:51). **Die gesamte Messreihe vom 18.11. hat Claude per Skript ausgeführt**
 (`messreihe.sh`, `handsession.mjs`); die Host- und Teilnehmeraktionen liefen über die tRPC-API,
-nicht im Browser. Selbst wiederholt hat Morris bisher keinen Lauf.
+nicht im Browser. **Am 20.11. hat Morris selbst** einen Großlage-Lauf (B1-M1) und eine
+Pausen-Störung in einer eigenen Browser-Session (S1-M1, mit Screenshots der Host-Ansicht)
+ausgeführt und den Stack danach angehalten; siehe [Eigene Läufe](#eigene-läufe-von-morris-20112026).
+Die Auswertung der Logs dazu hat Claude gemacht.
 
 Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 [4A-Matrix](4a-soll-ist-matrix.md), [Kontextbudget](befund-kontextbudget.md).
@@ -38,6 +41,8 @@ Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 | C2b-W | 18.11. 15:09–15:10 | Wiederaufnahme nach Stop, 30 s | Runtime nach 26,2 s ab healthy wieder erreicht (Breaker), dann `timeout`; kein Lauf ohne Fallback | [04-aenderung/](rohdaten/04-aenderung/) |
 | C3-W | 18.11. 15:10–15:11 | Kill-Switch | `disabled` sofort (0,38 s / 0,96 s), Live-Pfade wie B1 | [04-aenderung/](rohdaten/04-aenderung/) |
 | C4-W | 18.11. 15:11–15:12 | Rückweg 8 s | wie B1: `timeout` 8,96 s, 0 Fragen; `git status` leer | [04-aenderung/](rohdaten/04-aenderung/) |
+| B1-M1 | 20.11. 14:34–14:35 | **von Morris:** Großlage-Baseline | `timeout` 9,02 s, 0 von 2.500 Fragen – reproduziert B1 | [05-eigene-laeufe/](rohdaten/05-eigene-laeufe/) |
+| S1-M | 20.11. 14:36–15:03 | **von Morris:** Runtime pausiert, Browser-Session | 5 Anfragen, alle `timeout` 8,04 s; Host-Ansicht per Screenshot | [05-eigene-laeufe/](rohdaten/05-eigene-laeufe/) |
 
 ## Chronik
 
@@ -379,14 +384,58 @@ dritten Fehler), nicht so lange wie der Runtime-Neustart (6 s).
 - **Nicht verändert:** Releasecode, Queue-, Cooldown- und Circuit-Werte, Modell, Runtime-Flags,
   Rate-Limits.
 
+## Eigene Läufe von Morris (20.11.2026)
+
+Von Morris im Ubuntu-Terminal und im Browser ausgeführt; Zeitstempel per `marke` in
+[zeitstempel.txt](rohdaten/05-eigene-laeufe/zeitstempel.txt). Die Zeiten der Anfragen stammen aus
+dem App-Log (`latencyMs`), weil das Stoppen per Hand nicht praktikabel war. Logauswertung durch
+Claude. Stack um 15:07:27 angehalten (Labor eingefroren).
+
+**Wichtig zur Einordnung:** Das erste `docker pause` um 14:36:22 wurde erst um 15:03:03
+aufgehoben. Belegt durch das Runtime-Log: Nach dem `cancel task` von B1-M1 um 14:35:16 enthält es
+trotz fünf weiterer Summary-Anfragen keinen Eintrag mehr; mit laufender Runtime erzeugt jeder
+Abbruch einen. Alle Läufe zwischen 14:36 und 15:03 sind deshalb **Pausen-Störungen**, auch der
+zweite Großlage-Lauf und die als Baseline gedachte Anfrage „M-B“.
+
+| Lauf | Zeit (MEZ) | Zustand der Runtime | Summary | `latencyMs` (Log) | Weiteres |
+| --- | --- | --- | --- | ---: | --- |
+| B1-M1 (1) | 14:34:37–14:35:18 | läuft (Baseline) | `uncertain / extractive / timeout`, 9.022 ms gesamt | 8.426 | 0 von 2.500, 0 Quellen, 3.066/4.096; Q&A-p95 232 ms; Lernziele `{1,1}`; Runtime-Log `cancel task` – **reproduziert B1** |
+| B1-M1 (2) | 14:41:58–14:42:39 | pausiert | `uncertain / extractive / timeout`, 8.865 ms gesamt | 8.379 | 0 von 2.500; Q&A-p95 261 ms; kein Runtime-Logeintrag |
+| Anfrage | 14:50:02 | pausiert | `timeout` | 8.038 | Browser-Session |
+| „M-B“ | 14:58:44 | pausiert | `timeout` | 8.043 | Screenshot I |
+| S1-M1 | 15:01:31 | pausiert | `timeout` | 8.038 | – |
+| S1-M1 | 15:02:20 | pausiert | `timeout` | 8.043 | Screenshot II |
+
+In beiden Großlage-Läufen wurde wieder eine Stimmrunde per 429 abgelehnt (Laborartefakt, siehe
+Phase 1).
+
+**Was der Host sieht** ([Screenshot I](<rohdaten/05-eigene-laeufe/Moderationskompass Zusammenfassung I.png>),
+[Screenshot II](<rohdaten/05-eigene-laeufe/Moderationskompass Zusammenfassung II.png>), beide nach
+einem `timeout`):
+
+- Der **Regelkompass** (8.9a) bleibt voll nutzbar: Karte „Noch klären“ mit drei Q&A-Einträgen
+  und „Weitere Einstiege (3)“, also alle sechs Referenzfragen.
+- Im Block „Kurzfassung der offenen Fragen“ steht nach dem Klick auf „Zusammenfassung“ nur:
+  „Für eine extraktive Kurzfassung sind noch keine Textbelege ausgewählt.“ und unter
+  „Hinweise“: „Extraktive Kurzfassung ohne generative Interpretation.“
+- **Kein Hinweis auf die Störung:** Weder Timeout noch Ausfall noch ein Retry-Hinweis sind
+  sichtbar; der Button „Zusammenfassung“ bleibt anklickbar. Beide Screenshots sind inhaltlich
+  identisch. Der Host kann eine gestörte Runtime nicht von einer leeren Analyse unterscheiden;
+  der Text legt eher nahe, dass Belege fehlen. Details stünden nur in der eingeklappten
+  „Diagnose“.
+
+**Nicht ausgeführt:** E3 im Browser (Stimme ändern bei offenem Kompass) und das Stoppen der Zeit
+per Hand. E3 bleibt per API (Phase 3) und Code belegt.
+
 ## Noch nicht gemessen / offen
 
 - Begründung der Schwellen SW1–SW4 fürs Handout.
-- Host-Ansicht im Browser: Zeitpunkt der Aktualisierung nach einer Stimmenänderung (E3) und
-  HTTP-Status in den Entwicklertools (E2) nur per API bzw. Code belegt.
+- E3 in der Host-Ansicht: Zeitpunkt der Aktualisierung nach einer Stimmenänderung nur per API
+  bzw. Code belegt; E2 (HTTP-Status) per Treiber statt in den Entwicklertools.
+- Saubere Browser-Baseline mit laufender Runtime (M-B lief versehentlich unter Pause). Laut API
+  ist die Anzeige bei einem Baseline-Timeout dieselbe (B2-1: gleiche Hinweise, 0 Aussagen).
 - Ursache der höheren Q&A-p95 in C1-2/C1-3.
 - Die Runtime protokolliert keine Tokenzahlen und keine Prefill-Zeit.
-- Kein Lauf von Morris selbst wiederholt.
 
 ## Evidenzorte
 

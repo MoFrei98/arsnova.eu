@@ -1,0 +1,18 @@
+2026-11-20T13:58:51.873836094Z qa_summary:completed {
+2026-11-20T13:58:51.873858596Z   status: 'uncertain',
+2026-11-20T13:58:51.873859722Z   effectiveMode: 'extractive',
+2026-11-20T13:58:51.873860769Z   fallbackReason: 'timeout',
+2026-11-20T13:58:51.873861580Z   latencyMs: 8043
+2026-11-20T13:58:51.873862391Z }
+2026-11-20T14:01:39.176733740Z qa_summary:completed {
+2026-11-20T14:01:39.176753327Z   status: 'uncertain',
+2026-11-20T14:01:39.176754341Z   effectiveMode: 'extractive',
+2026-11-20T14:01:39.176755427Z   fallbackReason: 'timeout',
+2026-11-20T14:01:39.176756215Z   latencyMs: 8038
+2026-11-20T14:01:39.176756961Z }
+2026-11-20T14:02:27.838458563Z qa_summary:completed {
+2026-11-20T14:02:27.838479362Z   status: 'uncertain',
+2026-11-20T14:02:27.838480366Z   effectiveMode: 'extractive',
+2026-11-20T14:02:27.838481382Z   fallbackReason: 'timeout',
+2026-11-20T14:02:27.838482159Z   latencyMs: 8043
+2026-11-20T14:02:27.838482945Z }

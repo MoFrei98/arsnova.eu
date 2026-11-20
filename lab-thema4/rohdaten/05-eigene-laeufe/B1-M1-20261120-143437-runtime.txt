@@ -1,0 +1,1 @@
+13.21.082.082 W srv          stop: cancel task, id_task = 1

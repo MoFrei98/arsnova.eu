@@ -1,0 +1,12 @@
+rate_limit_429 {
+  path: 'vote.submit',
+  category: 'vote',
+  ipSource: 'express-req-ip',
+  suppressedSinceLastLog: 249
+}
+qa_summary:completed {
+  status: 'uncertain',
+  effectiveMode: 'extractive',
+  fallbackReason: 'timeout',
+  latencyMs: 8379
+}
