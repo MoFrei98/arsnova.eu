@@ -466,7 +466,9 @@ Kill-Switch und Rückweg verhalten sich wie spezifiziert, bestehende Lernziele b
 Fachlich liefert der Fallback in keinem einzigen Lauf Inhalt: Alle Kurzfassungen der Messreihe
 hatten 0 Aussagen und 0 Quellen, weil weder die Großlage noch die Sechs-Fragen-Session eine
 einzige Frage ins 4.096er-Budget bekommt. Bei 8 s erreicht kein Lauf ein Modellergebnis; bei 30 s
-einer von zwölf (C1-2, Großlage, 21,5 s), und auch er ist mangels Fragen `uncertain`. Die
+eine von zehn Summary-Anfragen (C1-2, Großlage, 21,5 s; die zehn sind C1-1..3, C1-H1..3, C2a ×2,
+C2b-W ×2, davon C2a-während bei pausierter Runtime), und auch sie ist mangels Fragen `uncertain`.
+(Korrigiert am 22.11.: vorher stand hier fälschlich „einer von zwölf“.) Die
 Wiederaufnahme nach einem Ausfall dauert so lange wie der offene Circuit Breaker (≈ 30 s ab dem
 dritten Fehler), nicht so lange wie der Runtime-Neustart (6 s).
 
