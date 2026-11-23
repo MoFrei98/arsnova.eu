@@ -27,6 +27,7 @@ Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 | R0 | 16.11. 14:18:16–14:18:56 | Smoke-Lauf Referenzfall (kein Teil der Messreihe) | Summary `uncertain / extractive / timeout`, 0 Fragen im Kontext | [00-smoke/](rohdaten/00-smoke/) |
 | P1 | 16.11. nach R0 | Budget-Probe (Release-Fixtures) | Sechs-Fragen-Fixture: 1 von 6 Fragen im 4.096er-Profil | [budget/budget-probe.json](rohdaten/budget/budget-probe.json) |
 | P2 | 16.11. nach P1 | Tokenize-Probe (echte Qwen3-Tokens) | Schätzer überschätzt um Faktor 2,9–5,2 | [budget/tokenize-probe.tsv](rohdaten/budget/tokenize-probe.tsv) |
+| P3 | 23.11. | Budget-Probe gegen `main` des Original-Repos (`7bfa8282`, nicht 1.3) | 8.192er-Profil: 2 von 6 Fragen mit Text + 2 Referenzen + 2 Themen; Korrektur seit v1.4.0, siehe [Befund, Nachtrag](befund-kontextbudget.md) | [06-upstream-main/](rohdaten/06-upstream-main/) |
 | B1-1..3 | 18.11. 14:08–14:13 | Baseline Großlage, 8 s | 3× `timeout` (8,76–8,86 s), 0 von 2.500 Fragen im Kontext | [01-baseline/](rohdaten/01-baseline/) |
 | B2-1..3 | 18.11. 14:12–14:13 | Baseline Handsession (#456 §12), 8 s | `timeout`, danach 2× `busy`; 0 von 6 Fragen im Kontext | [01-baseline/handsession.jsonl](rohdaten/01-baseline/handsession.jsonl) |
 | L0 | 18.11. 14:13 | Live-Last 30 TN ohne Störung | Submit-p95 175 ms, 90/90, 180/180 | [01-baseline/L0.json](rohdaten/01-baseline/L0.json) |

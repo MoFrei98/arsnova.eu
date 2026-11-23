@@ -108,3 +108,28 @@ npx tsx lab-thema4/probes/budget-probe.ts
 # WSL, Labor läuft
 bash /mnt/f/arsnova.eu/lab-thema4/probes/tokenize-probe.sh
 ```
+
+## Nachtrag 23.11.2026: Korrektur im Original-Repo (nach 1.3, nicht selbst gemessen)
+
+Das Original-Repo `kqc-real/arsnova.eu` hat die Ursachen kurz nach dem 1.3-Release behoben; alle
+drei Korrekturen sind in **v1.4.0** (7.11.2026) enthalten:
+
+| Commit | Datum | Änderung | Begründung laut Commit (sinngemäß) |
+| --- | --- | --- | --- |
+| `06a0a10f` | 14.10. | Neu packen mit Fragen-Textbasis und kürzeren Texten, bis mindestens eine Frage enthalten ist; sonst Fallback `no_packed_sources` statt Modellaufruf mit leerem Paket | – |
+| `c0a7f7d7` | 15.10. | Kontextfenster 4.096 → 8.192 in Packprofil und `llama-server --ctx-size` | das 4k-Fenster ließ die Produktionspakete leer |
+| `baa27b31` | 15.10. | `QA_SUMMARY_TIMEOUT_MS` Standard 8 s → 90 s (Maximum 300 s) | der kurze Timeout brach llama.cpp vor Ende des Prefills ab und erzwang den extraktiven Fallback |
+
+Zusätzlich sinkt die Antwortreserve von 640 auf 192 Tokens. Der byteweise Schätzer ist
+unverändert.
+
+**Budget-Probe gegen `main` vom 23.11.** (`7bfa8282`; Rohdaten
+[rohdaten/06-upstream-main/](rohdaten/06-upstream-main/), Dateinamen tragen noch „4096“ aus dem
+Skript, das Profil ist 8.192): Das Sechs-Fragen-Fixture packt 7.861 von 8.192 Byte-Tokens mit
+6 Quellen – 2 Fragen mit Text („Ist Kapitel 4 klausurrelevant?“, „Soll die Anwesenheit
+verpflichtend sein?“), 2 Fragen nur als Referenz ohne Text, 2 semantische Themen. In 1.3 war es
+eine Frage im Fixture und null im Live-Betrieb.
+
+**Grenze:** Nur Code und Fixture-Probe. Ob die Kurzfassung in 1.4/`main` auf der Laborhardware
+innerhalb von 90 s tatsächlich Inhalt liefert, ist nicht gemessen. Die Messreihe des Referats
+bezieht sich auf 1.3.
