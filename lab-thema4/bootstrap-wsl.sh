@@ -3,10 +3,13 @@
 #
 # Aufruf in Ubuntu (WSL2), sobald Docker Desktop mit WSL-Integration läuft:
 #   bash /mnt/f/arsnova.eu/lab-thema4/bootstrap-wsl.sh
+# Ohne Windows-Checkout (andere Rechner): Fork in WSL nach ~/arsnova.eu klonen und dort
+#   bash lab-thema4/bootstrap-wsl.sh
+# aufrufen; das Modell wird dann geladen (2,5 GB) und per SHA-256 geprüft.
 #
 # Ergebnis: ~/arsnova.eu auf Branch referat/thema-4 = Tag v1.3.0 plus Labordateien
-# (nicht main). Das Modell wird aus dem bereits geprüften Download auf F: kopiert,
-# nicht neu geladen. Danach läuft lab-thema4/setup-wsl.sh im WSL-Klon.
+# (nicht main). Das Modell wird aus dem bereits geprüften Download auf F: kopiert, falls
+# vorhanden, sonst geladen. Danach läuft lab-thema4/setup-wsl.sh im WSL-Klon.
 # Idempotent: ein vorhandener Klon wird nur aktualisiert.
 set -euo pipefail
 

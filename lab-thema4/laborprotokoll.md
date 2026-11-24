@@ -556,6 +556,12 @@ per Hand. E3 bleibt per API (Phase 3) und Code belegt.
   `lab-thema4/rohdaten/`.
 - WSL-Klon `~/arsnova.eu` (Ubuntu-24.04): Laborlauf. `.env` mit Laborsecrets bleibt lokal und
   ist gitignoriert.
+- Anleitung zum Nachprüfen und Wiederholen: [README.md](README.md).
+- **Nachträgliche Skriptänderung (24.11.):** In `messreihe.sh` und `tokenize-probe.sh` sind die
+  Pfade jetzt einstellbar (`REPO_DIR`, `RAW_DIR`, Fallback ohne Laufwerk F: auf den eigenen Klon,
+  neue Rohdaten dann in `rohdaten-wiederholung/`). Der Messablauf ist unverändert; mit
+  vorhandenem F:-Checkout verhalten sich die Skripte wie am 18.11. Die V1-Prüfung in Phase 1 liest
+  den Smoke-Report jetzt aus dem Klon statt aus dem Rohdatenziel (dieselbe Datei).
 - Laborcommits: alle Commits des Branches seit dem Release-Tag, `git log v1.3.0..referat/thema-4`.
   Gegenüber `v1.3.0` ändert der Branch nur `lab-thema4/` und die neue
   `docker-compose.override.yml`, keinen Produktcode.

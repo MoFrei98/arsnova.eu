@@ -5,14 +5,26 @@
 #   phase2   S1-1..3 (pause), S2 (stop + Circuit), S3-1..3 (Slot belegt)
 #   phase3   E3-1..2 (nur fachlich veraltet), E4 (Kontextvorschau)
 #   phase4   C1 (30 s), C2a, C2b, C3 (Kill-Switch), C4 (Rückweg)
-# Rohdaten landen direkt im Windows-Checkout: /mnt/f/arsnova.eu/lab-thema4/rohdaten.
+#   phase4b  C2b, C3, C4 wiederholen; wartet vorher das Session-Create-Fenster ab
+#
+# Pfade (nachträglich am 24.11. einstellbar gemacht, der Messablauf ist unverändert):
+#   REPO_DIR  Laborklon, Standard ~/arsnova.eu (wie bootstrap-wsl.sh)
+#   RAW_DIR   Ziel der Rohdaten. Standard wie am 18.11. der Windows-Checkout
+#             /mnt/f/arsnova.eu/lab-thema4/rohdaten, falls vorhanden; sonst
+#             lab-thema4/rohdaten-wiederholung im Klon, damit die Originaldaten unberührt bleiben.
 set -uo pipefail
-cd "$HOME/arsnova.eu"
+REPO="${REPO_DIR:-$HOME/arsnova.eu}"
+cd "$REPO" || { echo "FEHLER: Laborklon $REPO fehlt (REPO_DIR setzen)" >&2; exit 1; }
 export NVM_DIR="$HOME/.nvm"
 # shellcheck disable=SC1091
 . "$NVM_DIR/nvm.sh" >/dev/null
 nvm use >/dev/null
-R=/mnt/f/arsnova.eu/lab-thema4/rohdaten
+WIN_RAW=/mnt/f/arsnova.eu/lab-thema4/rohdaten
+if [ -n "${RAW_DIR:-}" ]; then R="$RAW_DIR"
+elif [ -d "$WIN_RAW" ]; then R="$WIN_RAW"
+else R="$REPO/lab-thema4/rohdaten-wiederholung"; fi
+mkdir -p "$R"
+echo "Rohdaten → $R" >&2
 LLM=arsnova-v3-open-weight-llm
 APP=arsnova-v3-app
 
@@ -89,7 +101,7 @@ bis_frei() {
 
 phase1() {
   mkdir -p "$R/01-baseline"
-  echo "== V1 Helfer am Smoke-Lauf"; zeig "$R/00-smoke/issue456-20261116-141816.json"
+  echo "== V1 Helfer am Smoke-Lauf"; zeig "$REPO/lab-thema4/rohdaten/00-smoke/issue456-20261116-141816.json"
   echo "== V2 Stack und Flags"; docker ps --format '{{.Names}} {{.Status}}'; echo -n "Flags (Timeout, LLM, Summary): "; flags
   for n in 1 2 3; do lauf 01-baseline "B1-$n"; [ "$n" -lt 3 ] && sleep 60; done
   local start; start=$(date -Iseconds)

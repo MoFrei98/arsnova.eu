@@ -5,9 +5,15 @@
 # Voraussetzung: Labor läuft (setup-wsl.sh), budget-probe.ts hat
 # lab-thema4/rohdaten/budget/ erzeugt. Ausführen in WSL:
 #   bash lab-thema4/probes/tokenize-probe.sh [Pfad zum budget-Ordner]
-# Standard-Eingabe ist der Windows-Checkout auf F:, Ausgabe tokenize-probe.tsv daneben.
+# Standard-Eingabe ist der Windows-Checkout auf F:, falls vorhanden, sonst
+# lab-thema4/rohdaten/budget im eigenen Klon (Fallback nachgetragen am 24.11.).
+# Ausgabe tokenize-probe.tsv daneben.
 set -euo pipefail
-IN_DIR="${1:-/mnt/f/arsnova.eu/lab-thema4/rohdaten/budget}"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+WIN_IN=/mnt/f/arsnova.eu/lab-thema4/rohdaten/budget
+if [ -n "${1:-}" ]; then IN_DIR="$1"
+elif [ -d "$WIN_IN" ]; then IN_DIR="$WIN_IN"
+else IN_DIR="$REPO/lab-thema4/rohdaten/budget"; fi
 export NVM_DIR="$HOME/.nvm"
 set +eu
 # shellcheck disable=SC1091
