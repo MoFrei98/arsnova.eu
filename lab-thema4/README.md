@@ -9,6 +9,7 @@ einzige Abweichung ist die eingeschaltete KI-Kurzfassung in
 
 | Datei / Ordner | Inhalt |
 | --- | --- |
+| [Handout-Thema4-Moderationskompass.pdf](Handout-Thema4-Moderationskompass.pdf) | Handout zum Referat (Deckblatt ohne Anschrift) |
 | [laborprotokoll.md](laborprotokoll.md) | Alle Läufe mit Zeiten, Messwerten, Schwellen SW1–SW4 und Bewertung |
 | [befund-kontextbudget.md](befund-kontextbudget.md) | Warum keine Frage bei der KI ankommt; Abgleich mit v1.4.0 |
 | [4a-soll-ist-matrix.md](4a-soll-ist-matrix.md) | Soll/Ist der Fehlerfälle aus den 1.3-Verträgen |
