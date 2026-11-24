@@ -120,8 +120,10 @@ drei Korrekturen sind in **v1.4.0** (7.11.2026) enthalten:
 | `c0a7f7d7` | 15.10. | Kontextfenster 4.096 → 8.192 in Packprofil und `llama-server --ctx-size` | das 4k-Fenster ließ die Produktionspakete leer |
 | `baa27b31` | 15.10. | `QA_SUMMARY_TIMEOUT_MS` Standard 8 s → 90 s (Maximum 300 s) | der kurze Timeout brach llama.cpp vor Ende des Prefills ab und erzwang den extraktiven Fallback |
 
-Zusätzlich sinkt die Antwortreserve von 640 auf 192 Tokens. Der byteweise Schätzer ist
-unverändert.
+Der byteweise Schätzer ist unverändert. Die Antwortreserve bleibt in v1.4.0 bei 640 Tokens
+(`moderationSummaryContext.ts:56` am Tag `v1.4.0`); erst auf `main` ist sie auf 192 gesenkt
+(`OPEN_WEIGHT_LLM_SUMMARY_V2_MAX_OUTPUT_TOKENS`, geprüft an `7bfa8282`). *Korrektur vom 24.11.:*
+Die erste Fassung dieses Nachtrags schrieb die 192 fälschlich schon v1.4.0 zu.
 
 **Budget-Probe gegen `main` vom 23.11.** (`7bfa8282`; Rohdaten
 [rohdaten/06-upstream-main/](rohdaten/06-upstream-main/), Dateinamen tragen noch „4096“ aus dem
@@ -130,6 +132,37 @@ Skript, das Profil ist 8.192): Das Sechs-Fragen-Fixture packt 7.861 von 8.192 By
 verpflichtend sein?“), 2 Fragen nur als Referenz ohne Text, 2 semantische Themen. In 1.3 war es
 eine Frage im Fixture und null im Live-Betrieb.
 
+Die Zahlen der Probe gelten für `main` mit 192 Tokens Antwortreserve. In v1.4.0 bleiben wegen der
+640er-Reserve 7.424 statt 7.872 Byte-Tokens für die Eingabe; wie viele Fragen dort mit Text
+hineinpassen, ist nicht gerechnet. Die Mindestabdeckung aus `06a0a10f` gilt in beiden Ständen.
+
 **Grenze:** Nur Code und Fixture-Probe. Ob die Kurzfassung in 1.4/`main` auf der Laborhardware
 innerhalb von 90 s tatsächlich Inhalt liefert, ist nicht gemessen. Die Messreihe des Referats
 bezieht sich auf 1.3.
+
+### Ergänzung 24.11.2026: Laufzeit laut Projekt, Standard, Beobachtbarkeit in v1.4.0
+
+Quellen: Tag `v1.4.0` und `main` des Original-Repos, nur gelesen, kein eigener Lauf.
+
+- **Die KI-Kurzfassung läuft laut Projektdokumentation.** `docs/features/qa-summary.md` (v1.4.0,
+  Z. 138, eingefügt mit `7ea8e835` am 17.10.2026): Auf dem privaten Produktionshost mit 8 vCPU
+  wurde `qa_summary` V2 „erfolgreich real ausgeführt“, in **56,9 s** mit 374 Completion-Tokens.
+  Einschränkungen derselben Doku: Gemessen wurde mit dem damaligen Vertrag
+  `qa-summary-technical-handoff-v2`, der aktuelle v4-Vertrag sei „noch neu zu vermessen“ (Z. 138).
+  Das 8.192er-Profil sei ein sicherer Betriebszustand, „aber keine bestandene Full-context- oder
+  CPU-Prefill-Abnahme“ (Z. 78).
+- **Folge für die Messreihe (4C):** 56,9 s liegen über dem Maximum, das 1.3 überhaupt zulässt
+  (`QA_SUMMARY_TIMEOUT_MAX_MS = 30_000`, `qaSummaryConfig.ts:13`). Eine echte Kurzfassung konnte in
+  1.3 auf CPU also auch mit der 30-s-Variante nicht fertig werden. v1.4.0 setzt Standard 90 s und
+  Maximum 300 s (`qaSummaryConfig.ts:23`, `:25`).
+- **Standard bleibt aus:** `.env.example` in v1.4.0 (Z. 203–204) setzt `QA_SUMMARY_ENABLED=false`
+  und `QA_SUMMARY_TIMEOUT_MS=90000`. Die Release-Notes 1.4.0 halten fest, dass die optionalen
+  KI-Schalter standardmäßig aus bleiben.
+- **4B unverändert:** Der Logeintrag `qa_summary:completed` hat in v1.4.0 (`qaSummaryQueue.ts:364`)
+  und auf `main` (`085810d0` vom 24.11., Z. 433) weiter nur `status`, `effectiveMode`,
+  `fallbackReason`, `latencyMs`. Die Zahl der übergebenen Fragen fehlt also weiterhin.
+- **Host-Anzeige:** Der Text für eine leere extraktive Kurzfassung ist in v1.4.0 umformuliert,
+  von „Für eine extraktive Kurzfassung sind noch keine Textbelege ausgewählt.“ zu „Es wurden noch
+  keine offenen Fragen für die Kurzfassung ausgewählt.“ (`qaSummaryExtractive.ts:23`). Eine
+  Auswertung von `fallback.reason` findet sich im Frontend-Code weder in 1.3 noch in 1.4.0. Im
+  Browser ist v1.4.0 nicht geprüft.

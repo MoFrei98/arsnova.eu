@@ -3,6 +3,7 @@
 Chronologisches Protokoll aller Schritte, Läufe und Messungen im lokalen Labor. Zeiten sind
 Ortszeit (MEZ). 12.–16.11.: Aufbau, Smoke-Lauf und Proben. 18.11.: Messreihe nach der
 Labor-Checkliste (Phasen 1–4), Ergebnisse im Abschnitt [Messreihe 18.11.](#messreihe-18112026).
+20.11.: eigene Läufe von Morris. 23.–24.11.: Abgleich mit v1.4.0, nur Code und Doku, kein Lauf.
 
 **KI-Hinweis:** Die Schritte wurden, sofern nicht anders vermerkt, von Claude (Claude Code) auf
 Anweisung von Morris ausgeführt und protokolliert. Von Morris selbst ausgeführt: Installation
@@ -12,7 +13,8 @@ von WSL und Docker Desktop, Annahme der Docker-Vereinbarung, Start des Stacks am
 nicht im Browser. **Am 20.11. hat Morris selbst** einen Großlage-Lauf (B1-M1) und eine
 Pausen-Störung in einer eigenen Browser-Session (S1-M1, mit Screenshots der Host-Ansicht)
 ausgeführt und den Stack danach angehalten; siehe [Eigene Läufe](#eigene-läufe-von-morris-20112026).
-Die Auswertung der Logs dazu hat Claude gemacht.
+Die Auswertung der Logs dazu hat Claude gemacht. Den Abgleich mit v1.4.0 (P3, D1) hat ebenfalls
+Claude gemacht.
 
 Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 [4A-Matrix](4a-soll-ist-matrix.md), [Kontextbudget](befund-kontextbudget.md).
@@ -28,6 +30,7 @@ Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 | P1 | 16.11. nach R0 | Budget-Probe (Release-Fixtures) | Sechs-Fragen-Fixture: 1 von 6 Fragen im 4.096er-Profil | [budget/budget-probe.json](rohdaten/budget/budget-probe.json) |
 | P2 | 16.11. nach P1 | Tokenize-Probe (echte Qwen3-Tokens) | Schätzer überschätzt um Faktor 2,9–5,2 | [budget/tokenize-probe.tsv](rohdaten/budget/tokenize-probe.tsv) |
 | P3 | 23.11. | Budget-Probe gegen `main` des Original-Repos (`7bfa8282`, nicht 1.3) | 8.192er-Profil: 2 von 6 Fragen mit Text + 2 Referenzen + 2 Themen; Korrektur seit v1.4.0, siehe [Befund, Nachtrag](befund-kontextbudget.md) | [06-upstream-main/](rohdaten/06-upstream-main/) |
+| D1 | 23.–24.11. | Abgleich mit v1.4.0: Code, Release-Notes, Projektdoku (kein Lauf) | Ursachen behoben; laut Projektdoku KI-Kurzfassung in 56,9 s auf 8 vCPU; Log weiter 4 Felder; Standard weiter aus, siehe [Befund, Ergänzung 24.11.](befund-kontextbudget.md) | – (Code-Stellen im Befund) |
 | B1-1..3 | 18.11. 14:08–14:13 | Baseline Großlage, 8 s | 3× `timeout` (8,76–8,86 s), 0 von 2.500 Fragen im Kontext | [01-baseline/](rohdaten/01-baseline/) |
 | B2-1..3 | 18.11. 14:12–14:13 | Baseline Handsession (#456 §12), 8 s | `timeout`, danach 2× `busy`; 0 von 6 Fragen im Kontext | [01-baseline/handsession.jsonl](rohdaten/01-baseline/handsession.jsonl) |
 | L0 | 18.11. 14:13 | Live-Last 30 TN ohne Störung | Submit-p95 175 ms, 90/90, 180/180 | [01-baseline/L0.json](rohdaten/01-baseline/L0.json) |
@@ -522,16 +525,23 @@ einem `timeout`):
 - **Kein Hinweis auf die Störung:** Weder Timeout noch Ausfall noch ein Retry-Hinweis sind
   sichtbar; der Button „Zusammenfassung“ bleibt anklickbar. Beide Screenshots sind inhaltlich
   identisch. Der Host kann eine gestörte Runtime nicht von einer leeren Analyse unterscheiden;
-  der Text legt eher nahe, dass Belege fehlen. Details stünden nur in der eingeklappten
-  „Diagnose“.
+  der Text legt eher nahe, dass Belege fehlen. Die eingeklappte „Diagnose“ enthält nur die
+  Kontextvorschau (Verträge, Umfang, Kürzungen): Auf Klick zeigt sie 0 Fragen im Kontext, den
+  Grund der Störung zeigt sie nicht (`moderation-compass-dialog.component.html` am Tag `v1.3.0`).
+  Der Text „Modell nicht rechtzeitig; lokale Kurzfassung.“ steht nur als Übersetzung im Frontend
+  (`qa-summary-chrome-copy.ts`), das 1.3-Backend erzeugt ihn nicht. *Nachgetragen am 24.11. aus
+  dem Code.*
 
 **Nicht ausgeführt:** E3 im Browser (Stimme ändern bei offenem Kompass) und das Stoppen der Zeit
 per Hand. E3 bleibt per API (Phase 3) und Code belegt.
 
 ## Noch nicht gemessen / offen
 
-- Begründung der Schwellen: Entwurf vom 20.11. liegt vor (siehe oben), Prüfung und Übernahme
-  ins Handout durch Morris; Literaturangaben gegen den myCampus-Leitfaden prüfen.
+- Begründung der Schwellen: im Handout übernommen (Abschnitt 3). Literaturangaben gegen den
+  myCampus-Leitfaden prüfen (Morris).
+- v1.4.0 nicht im Labor gemessen: Ob die Kurzfassung auf der Laborhardware innerhalb von 90 s
+  Inhalt liefert und wie die Host-Ansicht einen Fehler zeigt, ist offen. Vor einer Aktivierung
+  die Messreihe mit v1.4.0 wiederholen.
 - E3 in der Host-Ansicht: Zeitpunkt der Aktualisierung nach einer Stimmenänderung nur per API
   bzw. Code belegt; E2 (HTTP-Status) per Treiber statt in den Entwicklertools.
 - Saubere Browser-Baseline mit laufender Runtime (M-B lief versehentlich unter Pause). Laut API
@@ -546,5 +556,6 @@ per Hand. E3 bleibt per API (Phase 3) und Code belegt.
   `lab-thema4/rohdaten/`.
 - WSL-Klon `~/arsnova.eu` (Ubuntu-24.04): Laborlauf. `.env` mit Laborsecrets bleibt lokal und
   ist gitignoriert.
-- Laborcommits: `bb4678e3`, `04fd6fcc`, `ba2909d5`, `86e13f08`, `2558c863`, `5c59f0dd` und der
-  Commit dieses Protokolls.
+- Laborcommits: alle Commits des Branches seit dem Release-Tag, `git log v1.3.0..referat/thema-4`.
+  Gegenüber `v1.3.0` ändert der Branch nur `lab-thema4/` und die neue
+  `docker-compose.override.yml`, keinen Produktcode.
