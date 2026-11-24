@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "scenario": "qa-classroom-30",
+  "timestamp": "2026-11-24T14:51:13.502Z",
+  "environment": {
+    "participants": 30,
+    "questionsPerParticipant": 3,
+    "submitP95LimitMs": 1000,
+    "votePhaseLimitMs": 5000
+  },
+  "metrics": {
+    "scenario": "qa-classroom",
+    "code": "QHN3RJ",
+    "sessionId": "d58eb7cb-9393-4726-9c54-ea3799398166",
+    "participants": 30,
+    "qaConfiguredClosesAt": "2026-11-25T14:51:12.523Z",
+    "qaStartStatus": "ACTIVE",
+    "questionsPerParticipant": 3,
+    "expectedQuestions": 90,
+    "submittedQuestions": 90,
+    "submitPhase": {
+      "totalDurationMs": 213,
+      "p50Ms": 24,
+      "p95Ms": 128,
+      "maxMs": 154,
+      "replayed": 0,
+      "participantsAtExpectedQuota": 30,
+      "maxSessionQuestionCount": 90
+    },
+    "votesPerParticipant": {
+      "up": 3,
+      "down": 3
+    },
+    "expectedVotes": 180,
+    "votePhase": {
+      "accepted": 180,
+      "rejected": 0,
+      "totalDurationMs": 445
+    },
+    "hostModeration": {
+      "pin": 5,
+      "archive": 5,
+      "delete": 5,
+      "attempted": 15,
+      "accepted": 15,
+      "rejected": 0,
+      "errors": {},
+      "results": [
+        {
+          "questionId": "fa842268-0dcd-4e84-a054-8519e8d9afe9",
+          "action": "PIN",
+          "status": "PINNED"
+        },
+        {
+          "questionId": "608fd6b0-35d4-4d71-8d76-cc578c646a91",
+          "action": "PIN",
+          "status": "PINNED"
+        },
+        {
+          "questionId": "f140d8ad-bcbd-4974-99ee-b08cc83cdfc5",
+          "action": "PIN",
+          "status": "PINNED"
+        },
+        {
+          "questionId": "c250eabe-8d9f-4876-9205-7955f5d27254",
+          "action": "PIN",
+          "status": "PINNED"
+        },
+        {
+          "questionId": "da925ac1-2a49-48bb-838a-ebdf195e92fb",
+          "action": "PIN",
+          "status": "PINNED"
+        },
+        {
+          "questionId": "7d08666e-0713-4c4e-b5f3-33268d65a6b9",
+          "action": "ARCHIVE",
+          "status": "ARCHIVED"
+        },
+        {
+          "questionId": "1b472962-2646-4187-ac86-dcedd6f79b0a",
+          "action": "ARCHIVE",
+          "status": "ARCHIVED"
+        },
+        {
+          "questionId": "d861c26d-cec8-4c4c-8d99-8022fe7eb228",
+          "action": "ARCHIVE",
+          "status": "ARCHIVED"
+        },
+        {
+          "questionId": "d5085cbb-e138-4793-9218-8f99c5cc67c8",
+          "action": "ARCHIVE",
+          "status": "ARCHIVED"
+        },
+        {
+          "questionId": "75f9b7ca-6e29-4285-bd6a-3e821d210dd4",
+          "action": "ARCHIVE",
+          "status": "ARCHIVED"
+        },
+        {
+          "questionId": "15be9d95-851d-4749-86b0-d0920942d2f2",
+          "action": "DELETE",
+          "status": "DELETED"
+        },
+        {
+          "questionId": "bb9f2b3e-bdeb-4c3a-a267-94c4f460b7ee",
+          "action": "DELETE",
+          "status": "DELETED"
+        },
+        {
+          "questionId": "1f47366b-2134-443d-a180-6f7c99a5cf99",
+          "action": "DELETE",
+          "status": "DELETED"
+        },
+        {
+          "questionId": "e3194fa2-ee87-42c4-9216-eeae52d5026e",
+          "action": "DELETE",
+          "status": "DELETED"
+        },
+        {
+          "questionId": "5ffe1064-f145-46b4-bd8b-6f09bb0afab8",
+          "action": "DELETE",
+          "status": "DELETED"
+        }
+      ]
+    },
+    "finalStatusCounts": {
+      "PINNED": 5,
+      "ACTIVE": 75,
+      "ARCHIVED": 5
+    },
+    "hostListPages": 1,
+    "hostListTotalCount": 85,
+    "expectedVisibleAfterModeration": 85,
+    "visibleAfterModeration": 85
+  },
+  "assertions": [
+    {
+      "name": "scenario",
+      "passed": true
+    }
+  ]
+}

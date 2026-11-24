@@ -1,0 +1,6 @@
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'invalid_response',
+  latencyMs: 71604
+}

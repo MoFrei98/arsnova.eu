@@ -1,0 +1,12 @@
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'disabled',
+  latencyMs: 45
+}
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'disabled',
+  latencyMs: 41
+}

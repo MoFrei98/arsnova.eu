@@ -3,7 +3,9 @@
 Chronologisches Protokoll aller Schritte, Läufe und Messungen im lokalen Labor. Zeiten sind
 Ortszeit (MEZ). 12.–16.11.: Aufbau, Smoke-Lauf und Proben. 18.11.: Messreihe nach der
 Labor-Checkliste (Phasen 1–4), Ergebnisse im Abschnitt [Messreihe 18.11.](#messreihe-18112026).
-20.11.: eigene Läufe von Morris. 23.–24.11.: Abgleich mit v1.4.0, nur Code und Doku, kein Lauf.
+20.11.: eigene Läufe von Morris. 23.–24.11.: Abgleich mit v1.4.0 (Code und Doku). 24.11.:
+Kontrolllauf mit v1.4.0 auf derselben Laborhardware, siehe
+[Kontrolllauf v1.4.0](#kontrolllauf-v140-24112026).
 
 **KI-Hinweis:** Die Schritte wurden, sofern nicht anders vermerkt, von Claude (Claude Code) auf
 Anweisung von Morris ausgeführt und protokolliert. Von Morris selbst ausgeführt: Installation
@@ -13,8 +15,8 @@ von WSL und Docker Desktop, Annahme der Docker-Vereinbarung, Start des Stacks am
 nicht im Browser. **Am 20.11. hat Morris selbst** einen Großlage-Lauf (B1-M1) und eine
 Pausen-Störung in einer eigenen Browser-Session (S1-M1, mit Screenshots der Host-Ansicht)
 ausgeführt und den Stack danach angehalten; siehe [Eigene Läufe](#eigene-läufe-von-morris-20112026).
-Die Auswertung der Logs dazu hat Claude gemacht. Den Abgleich mit v1.4.0 (P3, D1) hat ebenfalls
-Claude gemacht.
+Die Auswertung der Logs dazu hat Claude gemacht. Den Abgleich mit v1.4.0 (P3, D1) und den
+Kontrolllauf mit v1.4.0 (K1–K4, auf Wunsch von Morris am 24.11.) hat ebenfalls Claude gemacht.
 
 Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 [4A-Matrix](4a-soll-ist-matrix.md), [Kontextbudget](befund-kontextbudget.md).
@@ -31,6 +33,10 @@ Umgebung im Detail: [referenzmanifest.md](referenzmanifest.md). Befunde:
 | P2 | 16.11. nach P1 | Tokenize-Probe (echte Qwen3-Tokens) | Schätzer überschätzt um Faktor 2,9–5,2 | [budget/tokenize-probe.tsv](rohdaten/budget/tokenize-probe.tsv) |
 | P3 | 23.11. | Budget-Probe gegen `main` des Original-Repos (`7bfa8282`, nicht 1.3) | 8.192er-Profil: 2 von 6 Fragen mit Text + 2 Referenzen + 2 Themen; Korrektur seit v1.4.0, siehe [Befund, Nachtrag](befund-kontextbudget.md) | [06-upstream-main/](rohdaten/06-upstream-main/) |
 | D1 | 23.–24.11. | Abgleich mit v1.4.0: Code, Release-Notes, Projektdoku (kein Lauf) | Ursachen behoben; laut Projektdoku KI-Kurzfassung in 56,9 s auf 8 vCPU; Log weiter 4 Felder; Standard weiter aus, siehe [Befund, Ergänzung 24.11.](befund-kontextbudget.md) | – (Code-Stellen im Befund) |
+| K1-1..2 | 24.11. 15:42–15:48 | **v1.4.0**, Großlage, 90 s | 8 Fragen im Kontext; KI rechnet 72–83 s, Antwort verworfen (`invalid_response`); Ersatz aus Fragen | [07-v140-kontrolllauf/](rohdaten/07-v140-kontrolllauf/) |
+| K2-1..3 | 24.11. 15:48–15:51 | **v1.4.0**, Handsession, 90 s | 3 Fragen im Kontext (alle 3 Themen); KI 51–66 s, 3× verworfen; Ersatz 3 Aussagen, 3 Quellen | [07-v140-kontrolllauf/](rohdaten/07-v140-kontrolllauf/) |
+| K3a/K3b | 24.11. 15:51 | **v1.4.0**, Live-Last ohne/mit KI-Lauf | Submit-p95 100 / 128 ms, 90/90, 180/180; KI-Lauf daneben 43 s, verworfen | [07-v140-kontrolllauf/](rohdaten/07-v140-kontrolllauf/) |
+| K4-1..2 | 24.11. 15:54 | **v1.4.0**, Not-Aus | `disabled` nach 0,32–0,36 s, dieselbe Ersatz-Kurzfassung (3 Aussagen, 3 Quellen) | [07-v140-kontrolllauf/](rohdaten/07-v140-kontrolllauf/) |
 | B1-1..3 | 18.11. 14:08–14:13 | Baseline Großlage, 8 s | 3× `timeout` (8,76–8,86 s), 0 von 2.500 Fragen im Kontext | [01-baseline/](rohdaten/01-baseline/) |
 | B2-1..3 | 18.11. 14:12–14:13 | Baseline Handsession (#456 §12), 8 s | `timeout`, danach 2× `busy`; 0 von 6 Fragen im Kontext | [01-baseline/handsession.jsonl](rohdaten/01-baseline/handsession.jsonl) |
 | L0 | 18.11. 14:13 | Live-Last 30 TN ohne Störung | Submit-p95 175 ms, 90/90, 180/180 | [01-baseline/L0.json](rohdaten/01-baseline/L0.json) |
@@ -535,13 +541,68 @@ einem `timeout`):
 **Nicht ausgeführt:** E3 im Browser (Stimme ändern bei offenem Kompass) und das Stoppen der Zeit
 per Hand. E3 bleibt per API (Phase 3) und Code belegt.
 
+## Kontrolllauf v1.4.0 (24.11.2026)
+
+Auf Wunsch von Morris nach der Abgabeplanung ergänzt; kein Teil der 1.3-Messreihe und kein
+Ersatz für sie. Ziel: prüfen, ob die KI-Kurzfassung im neuesten Release auf derselben
+Laborhardware tatsächlich Inhalt liefert. Skripte: [probes/v140/](probes/v140/), Rohdaten:
+[rohdaten/07-v140-kontrolllauf/](rohdaten/07-v140-kontrolllauf/).
+
+**Aufbau:** eigener Worktree `~/arsnova-v140` auf Tag `v1.4.0` (`babc3a97`), frisch gebaute Images,
+eigene Datenbank-Volumes, 1.3-Stack vorher angehalten (Volumes erhalten). Gleiche Laborteile wie
+in 1.3: Override mit KI-Kurzfassung an, Laborsecrets aus der 1.3-`.env`, dasselbe Modell (gleicher
+SHA-256, harter Link), dasselbe Runtime-Image `llama.cpp b10524`, KI-Container wieder 4 CPU-Kerne
+und 5 GB. Abweichung der Override: Timeout-Standard 90 s statt 8 s, weil v1.4.0 selbst 90 s als
+Standard setzt; sonst hätte die 1.3-Override 8 s erzwungen. Laut `/props` der Runtime:
+`n_ctx` 8.192, 1 Slot. Flags `90000 / true / true`.
+
+| Lauf | Kontext | KI | Ergebnis für Lehrende | Live |
+| --- | --- | --- | --- | --- |
+| K1-1 Großlage | 2.500 → 200 analysiert → 13 verschieden → **8 im Kontext**, 8 Quellen, 7.342/8.192 | rechnet, Antwort verworfen (`invalid_response`), 82,7 s gesamt | extraktive Ersatz-Kurzfassung | Q&A-p95 783 ms; Lesen während KI p95 17 ms; Stimmen 3.500/3.500 |
+| K1-2 Großlage | wie K1-1, 7.353/8.192 | verworfen, 72,0 s | wie K1-1 | Q&A-p95 728 ms; Lesen p95 14 ms; 3.500/3.500 |
+| K2-1..3 Handsession | 6 → 3 verschieden → **3 im Kontext** (alle drei Themenpaare), 3 Quellen, 5.340 gepackt | verworfen, 50,9 / 65,6 / 64,2 s | **3 Aussagen, 3 Quellen** („die wichtigsten Fragen im Wortlaut“) | – |
+| K3a Live-Last allein | – | – | – | Submit-p95 100 ms (max 118), 90/90, 180/180 |
+| K3b Live-Last + KI | Handsession | verworfen, 42,8 s | 3 Aussagen, 3 Quellen | Submit-p95 128 ms (max 154), 90/90, 180/180 |
+| K4-1..2 Not-Aus | Handsession | aus (`disabled`) | **dieselben 3 Aussagen, 3 Quellen nach 0,32–0,36 s** | – |
+
+**Befund:**
+
+- **Ursache aus 1.3 behoben:** Fragen erreichen das Modell (8 statt 0 in der Großlage, alle drei
+  Themen der Handsession), der Timeout greift nicht mehr. Die Ersatz-Kurzfassung ist nicht mehr
+  leer, sondern zeigt die wichtigsten Fragen im Wortlaut mit Quellen.
+- **Aber keine gültige KI-Kurzfassung:** 0 von 6 Modellläufen wurden angenommen. Die KI rechnete
+  43–83 s und lieferte jedes Mal eine Antwort, die der Client als abgeschlossen verbuchte: Der
+  Schutzschalter zählte keinen Fehler, sonst hätte er nach dem dritten Lauf in Folge gesperrt
+  (Schwelle 3, `openWeightLlmClient.ts:176–181`, `openWeightLlmConfig.ts:9`). Die App verwarf die
+  Antwort danach bei der Prüfung von Format oder Qualität (`qaSummaryRuntimeAdapter.ts`,
+  `hasAcceptableQaSummaryQuality` verlangt u. a. mindestens zwei Aussagen im Format
+  „Stichwort: Satz“ mit verschiedenen Stichworten). Welche Prüfung griff, ist nicht protokolliert.
+  Das passt zur Projektdoku: Der aktuelle Vertrag sei „noch neu zu vermessen“.
+- **Gegenalternative weiter besser:** Mit Not-Aus erhalten Lehrende dieselbe Ersatz-Kurzfassung
+  nach 0,3 s statt nach rund einer Minute.
+- **Live-Betrieb:** Lesen während des KI-Laufs unverändert schnell (p95 14–17 ms, in 1.3 15–21 ms).
+  Die kleine Live-Last wird neben dem KI-Lauf langsamer (p95 128 statt 100 ms, +28 %), bleibt aber
+  unter dem 1.3-Bezugswert von 175 ms. Das Q&A-p95 der Großlage (728–783 ms) wird vor der
+  Summary-Anforderung gemessen (`issue-456-demo-acceptance.mjs`, Reihenfolge Q&A → Vorschau →
+  Anforderung); die KI kann es nicht verursacht haben. Es ähnelt C1-2/C1-3 in 1.3 (797/832 ms),
+  Ursache weiter offen. Release-SLO (p95 ≤ 1.000 ms) eingehalten.
+- **Beobachtbarkeit (4B) eher schlechter:** Das Log `qa_summary:completed` hat weiter nur vier
+  Felder und nennt bei `invalid_response` keinen Grund. Das Runtime-Log enthält in v1.4.0 keine
+  Einträge pro Anfrage mehr (in 1.3 noch `cancel task`); die Dateien `*-runtime.txt` sind leer.
+- **Nebenbei:** In v1.4.0 lehnt das Rate-Limit in der Großlage keine Stimmrunde mehr ab
+  (3.500/3.500 statt 3.250/3.500).
+
+**Gültigkeitsgrenzen:** Zwei Großlagen, sechs Modellläufe, ein Not-Aus-Paar, je ein Live-Lauf; ein
+Rechner mit 4 Kernen für die KI statt eines eigenen KI-Servers. Die Qualität der verworfenen
+Antworten ist nicht sichtbar und nicht bewertet.
+
 ## Noch nicht gemessen / offen
 
 - Begründung der Schwellen: im Handout übernommen (Abschnitt 3). Literaturangaben gegen den
   myCampus-Leitfaden prüfen (Morris).
-- v1.4.0 nicht im Labor gemessen: Ob die Kurzfassung auf der Laborhardware innerhalb von 90 s
-  Inhalt liefert und wie die Host-Ansicht einen Fehler zeigt, ist offen. Vor einer Aktivierung
-  die Messreihe mit v1.4.0 wiederholen.
+- v1.4.0: Warum die KI-Antworten verworfen werden (Format oder Qualität), ist nicht protokolliert;
+  dafür bräuchte es eine Laborinstrumentierung. Die Host-Ansicht von v1.4.0 ist nicht im Browser
+  geprüft. Die vollständige Messreihe (Störungen, Rückweg) lief nur für 1.3.
 - E3 in der Host-Ansicht: Zeitpunkt der Aktualisierung nach einer Stimmenänderung nur per API
   bzw. Code belegt; E2 (HTTP-Status) per Treiber statt in den Entwicklertools.
 - Saubere Browser-Baseline mit laufender Runtime (M-B lief versehentlich unter Pause). Laut API

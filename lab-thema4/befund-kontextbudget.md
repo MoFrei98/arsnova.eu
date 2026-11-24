@@ -136,9 +136,15 @@ Die Zahlen der Probe gelten für `main` mit 192 Tokens Antwortreserve. In v1.4.0
 640er-Reserve 7.424 statt 7.872 Byte-Tokens für die Eingabe; wie viele Fragen dort mit Text
 hineinpassen, ist nicht gerechnet. Die Mindestabdeckung aus `06a0a10f` gilt in beiden Ständen.
 
-**Grenze:** Nur Code und Fixture-Probe. Ob die Kurzfassung in 1.4/`main` auf der Laborhardware
-innerhalb von 90 s tatsächlich Inhalt liefert, ist nicht gemessen. Die Messreihe des Referats
-bezieht sich auf 1.3.
+**Grenze:** Nur Code und Fixture-Probe. Die Messreihe des Referats bezieht sich auf 1.3.
+
+**Kontrolllauf am 24.11. (v1.4.0 im Labor, Details im
+[Laborprotokoll](laborprotokoll.md#kontrolllauf-v140-24112026)):** Das Packen funktioniert auch
+live. Großlage: 2.500 Fragen → 200 analysiert → 13 verschieden → 8 im Kontext, 8 Quellen,
+7.342 von 8.192. Handsession: 6 → 3 verschieden → 3 im Kontext (alle drei Themenpaare), 5.340
+gepackt. Die KI rechnet 43–83 s und bleibt unter dem 90-s-Timeout, ihre Antwort wird aber in
+6 von 6 Läufen verworfen (`invalid_response`). Die Ersatz-Kurzfassung zeigt jetzt 3 Fragen mit
+Quellen statt nichts.
 
 ### Ergänzung 24.11.2026: Laufzeit laut Projekt, Standard, Beobachtbarkeit in v1.4.0
 

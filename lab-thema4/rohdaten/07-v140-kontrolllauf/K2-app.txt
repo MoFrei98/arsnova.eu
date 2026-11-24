@@ -1,0 +1,24 @@
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'invalid_response',
+  latencyMs: 71604
+}
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'invalid_response',
+  latencyMs: 50834
+}
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'invalid_response',
+  latencyMs: 65484
+}
+qa_summary:completed {
+  status: 'ready',
+  effectiveMode: 'extractive',
+  fallbackReason: 'invalid_response',
+  latencyMs: 64096
+}

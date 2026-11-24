@@ -22,7 +22,10 @@ einzige Abweichung ist die eingeschaltete KI-Kurzfassung in
 Jede Zahl aus Handout und Folien steht im Laborprotokoll mit Verweis auf die Rohdaten. Zuordnung
 der Ordner: `00-*` Aufbau und Smoke-Lauf, `01-baseline` Phase 1, `02-stoerung` Phase 2 (4A),
 `03-erkennung` Phase 3 (4B), `04-aenderung` Phase 4 (4C), `05-eigene-laeufe` Läufe vom 20.11.
-mit Screenshots, `budget` und `06-upstream-main` Budget- und Tokenize-Probe.
+mit Screenshots, `budget` und `06-upstream-main` Budget- und Tokenize-Probe,
+`07-v140-kontrolllauf` Kontrolllauf mit Release v1.4.0 vom 24.11. (Skripte in
+[probes/v140/](probes/v140/); eigener Worktree auf Tag `v1.4.0`, Ablauf
+`prepare-v140.sh` → `up-v140.sh` → `messung-v140.sh` → `notaus-v140.sh`).
 
 Die **Budget-Probe** ist deterministisch und läuft ohne Docker. Im Repo-Root eines Klons auf
 `referat/thema-4`:
@@ -90,5 +93,6 @@ her. Labor anhalten mit `docker compose down` im Klon.
 ## Grenzen und Sicherheit
 
 Nur lokal gegen `127.0.0.1`, nie gegen arsnova.eu. Synthetische Daten aus den Release-Fixtures
-und Lastskripten. v1.4.0 wurde nicht im Labor gemessen. Skripte und automatisierte Läufe sind mit
+und Lastskripten. v1.4.0 lief nur als Kontrolllauf (K1–K4), nicht als vollständige Messreihe.
+Skripte und automatisierte Läufe sind mit
 Claude Code entstanden; siehe KI-Hinweis im [Laborprotokoll](laborprotokoll.md).

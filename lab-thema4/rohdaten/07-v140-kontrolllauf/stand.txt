@@ -1,0 +1,6 @@
+Tag: v1.4.0
+Commit: babc3a97af0b8ce0eb867a566934e7004e9875f1 2026-11-07 20:22:32 +0100
+Flags (Timeout, LLM, Summary): 90000 true true 
+Runtime /props: "build_info":"b10524-9ee9fc04c" "n_ctx":8192 "total_slots":1 
+Limits Runtime: cpus=4000000000 mem=5368709120
+CPU: Intel(R) Core(TM) i7-14700 · 28 logische CPUs für WSL
